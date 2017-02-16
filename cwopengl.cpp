@@ -1,23 +1,115 @@
-#include "stdafx.h"
-
-#include <iostream>
-
 #include "cwopengl.h"
 
-CWOpenGL::CWOpenGL(const char *szName, bool fscreen, int w, int h, int b)
+CWOpenGL::CWOpenGL(const char *szFile)
+{
+	string aux;
+
+	//Create the file
+	m_File = new CFileDef(szFile);
+
+	// Read the content of file
+	if (m_File->getIsOpen())
+	{
+		m_File->readObjectKeysValues();
+
+		// Gets the name ob object
+		m_szName = m_File->getObjectName();
+
+		// Gets the properties from file */
+
+		// FULLSCREEN
+		aux = m_File->getObjectValues("FULLSCREEN")[0];
+		if (aux == "N")
+			m_bfullscreen = false;
+		else if (aux == "Y")
+			m_bfullscreen = true;
+		else
+		{
+			MessageBOX("Engine file error", "Error near to 'FULLSCREEN'");
+			exit(0);
+		}
+
+		// VERTICAL SYNC
+		aux = m_File->getObjectValues("VSYNC")[0];
+		if (aux == "N")
+			m_bvsync = false;
+		else if (aux == "Y")
+			m_bvsync = true;
+		else
+		{
+			MessageBOX("Error near to 'VSYNC'", "Engine file error");
+			delete m_File;
+			exit(0);
+		}
+
+		// WINDOW WIDTH
+		m_width = std::stoi(m_File->getObjectValues("WINDOW_RES")[0]);
+		if (m_width < 320 || m_width > 1920)
+		{
+			MessageBOX("Window width value invalid", "Engine file error");
+			delete m_File;
+			exit(0);
+		}
+
+		// WINDOW HEIGHT
+		m_height = std::stoi(m_File->getObjectValues("WINDOW_RES")[1]);
+		if (m_height < 200 || m_height > 1200)
+		{
+			MessageBOX("Window height value invalid", "Engine file error");
+			delete m_File;
+			exit(0);
+		}
+
+		// WINDOW DEPTH BITS
+		m_bits = std::stoi(m_File->getObjectValues("WINDOW_RES")[2]);
+		if (m_bits != 8 && m_bits != 16 && m_bits != 24 && m_bits != 32)
+		{
+			MessageBOX("Window bits depth color value invalid", "Engine file error");
+			delete m_File;
+			exit(0);
+		}
+
+		// WORLD file
+		m_sWorldFile = m_File->getObjectValues("WORLD")[0];
+		if (m_sWorldFile == "")
+		{
+			MessageBOX("World file not error", "Engine file error");
+			delete m_File;
+			exit(0);
+		}
+
+		delete m_File;
+
+		Create();
+	}
+	else
+		MessageBOX("It does not exists", "Engine file error");
+
+}
+
+CWOpenGL::CWOpenGL(const char *szName, bool fscreen, bool vsync, int w, int h, int b)
 {
 	m_width = w;
 	m_height = h;
 	m_bits = b;
+	m_bfullscreen = fscreen;
+	m_bvsync = vsync;
+	m_szName = (char*) szName;
+
+	Create();
+}
+
+void CWOpenGL::Create()
+{
 	m_mouseX = 0;
 	m_mouseY = 0;
-	m_szName = (char*) szName;
 	m_mouseSensitivity = 0.2f;
+	m_aspect = 0.0;
 
 	Uint32 flags = SDL_WINDOW_OPENGL;
 
 	/* Set full screen if fsscreen parameter is true */
-	if (fscreen)
+	if (m_bfullscreen)
 		flags = flags | SDL_WINDOW_FULLSCREEN;
 
 	/* Initialize SDL's Video subsystem */
@@ -38,7 +130,7 @@ CWOpenGL::CWOpenGL(const char *szName, bool fscreen, int w, int h, int b)
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, m_bits);
 
 	/* Create our window centered at 512x512 resolution */
-	m_mainwindow = SDL_CreateWindow(m_szName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+	m_mainwindow = SDL_CreateWindow(m_szName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		m_width, m_height, flags);
 
 	/* Die if creation failed */
@@ -62,13 +154,13 @@ CWOpenGL::CWOpenGL(const char *szName, bool fscreen, int w, int h, int b)
 	/* Load OpenGL functions */
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
-		exit(0);
+		throw std::exception();
 	}
 
 	/* This makes our buffer swap syncronized with the monitor's vertical refresh. Parameter: */
 	/* 0 -> without sync refresh */
 	/* 1 -> Sync refresh */
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval((int)m_bvsync);
 }
 
 void CWOpenGL::Resize()

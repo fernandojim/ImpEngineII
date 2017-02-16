@@ -3,7 +3,10 @@
 #include "cshader.h"
 #include "utils.h"
 
-using namespace ansiCToUnicode;
+CShader::CShader(const char* vs, const char* fs)
+{
+	m_err = CreaShaders(vs, fs);
+}
 
 ERROR_TYPE CShader::CreaShaders(const char* vs, const char* fs)
 {
@@ -35,18 +38,12 @@ ERROR_TYPE CShader::CompilaShaders()
     glCompileShader(m_uiVertexShader);
     glGetShaderiv(m_uiVertexShader, GL_COMPILE_STATUS, &m_iCompileStatusVertexShader);
 
-	//Obtiene el mensaje de error
+	//Obtiene y visualiza el mensaje de error
 	if ( !m_iCompileStatusVertexShader )
 	{
 		glGetShaderInfoLog(m_uiVertexShader, MAX_INFO_LOG, NULL, m_sLogCompileStatusVertexShader);
 
-		//Visual C++ 2013
-		//Visualiza mensaje de error
-		//MessageBox(NULL, ansiCToUnicode::ansiCToUnicode(m_sLogCompileStatusVertexShader).c_str(),
-		//				 ansiCToUnicode::ansiCToUnicode("Vertex Shader compile error").c_str(), MB_OK);
-		
-		//Dev-C++ 5.11				 
-		MessageBox(NULL, m_sLogCompileStatusVertexShader, "Vertex Shader compile error", MB_OK);
+		MessageBOX(m_sLogCompileStatusVertexShader, "Vertex Shader compile error");
 
 		return VS_COMPILE_ERROR;
 	}
@@ -56,17 +53,13 @@ ERROR_TYPE CShader::CompilaShaders()
 	glShaderSource(m_uiFragmentShader, 1, &m_sFragSource, NULL);
     glCompileShader(m_uiFragmentShader);
     glGetShaderiv(m_uiFragmentShader, GL_COMPILE_STATUS, &m_iCompileStatusFragmentShader);
+
+    //Visualiza mensaje de error
 	if ( !m_iCompileStatusFragmentShader )
 	{
 		glGetShaderInfoLog(m_uiFragmentShader, MAX_INFO_LOG, NULL, m_sLogCompileStatusFragmentShader);
 
-		//Visual C++ 2013
-		//Visualiza mensaje de error
-		//MessageBox(NULL, ansiCToUnicode::ansiCToUnicode(m_sLogCompileStatusFragmentShader).c_str(),
-		//				 ansiCToUnicode::ansiCToUnicode("Fragment Shader compile error").c_str(), MB_OK);
-						 
-		//Dev-C++ 5.11
-		MessageBox(NULL, m_sLogCompileStatusVertexShader, "Fragment Shader compile error", MB_OK);
+		MessageBOX(m_sLogCompileStatusFragmentShader, "Fragment Shader compile error");
 
 		return FS_COMPILE_ERROR;
 	}
@@ -94,12 +87,7 @@ ERROR_TYPE CShader::LinkaShaders()
 		//Visualiza mensaje de error
 		if (strlen(m_sLogLinkStatusShaders) > 0)
 		{
-			//Visual C++ 2013
-			//MessageBox(NULL, ansiCToUnicode::ansiCToUnicode(m_sLogLinkStatusShaders).c_str(),
-			//				 ansiCToUnicode::ansiCToUnicode("Shader linker error").c_str(), MB_OK);
-			
-			//Dev-C++ 5.11
-			MessageBox(NULL, m_sLogLinkStatusShaders, "Shader linker error", MB_OK);
+			MessageBOX(m_sLogLinkStatusShaders, "Shader linker error");
 		}
 		
 		//We don't need the program anymore.
@@ -118,23 +106,37 @@ ERROR_TYPE CShader::LinkaShaders()
 	return NO_ERR;
 }
 
-char* CShader::GetBufferFromFile( const char* in_szFilename )
+GLchar* CShader::GetBufferFromFile( const char* in_szFilename )
 {
-	FILE* pFile = NULL;
+	ifstream file;
+	int size;
+	char *buffer;
 
-	if( (pFile = fopen_s( in_szFilename, "rb" )) != NULL )
+	//It is important to set the binary mode
+	file.open(in_szFilename, std::ios::binary);
+
+	if (file.is_open())
 	{
-		fseek( pFile, 0, SEEK_END );
-		unsigned int nSize = ftell( pFile );
-		fseek( pFile, 0, SEEK_SET );
+		//Set at the end of the file to calculate the size
+		file.seekg(0, std::ios::end);
 
-		char* pBuffer = new char[nSize+1];
-		fread( pBuffer, sizeof(char), nSize, pFile );
-		fclose( pFile );
+		//Calculate its size in bytes
+		size = file.tellg();
 
-		pBuffer[nSize] = '\0';
+		//Get back to the begining
+		file.seekg(0, std::ios::beg);
 
-		return pBuffer;                         
+		//Create the buffer
+		buffer = new char[size + 1];
+
+		//Read it
+		file.read((char*)&buffer[0], size);
+		buffer[size] = '\0';
+
+		//Closes the file
+		file.close();
+
+		return buffer;
 	}
 
 	return 0;
@@ -144,3 +146,49 @@ ERROR_TYPE CShader::getError()
 {
 	return m_err;
 }
+
+void CShader::setUniformShader1f(const string variable, GLfloat v1)
+{
+	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniform1f(val, v1);
+}
+
+void CShader::setUniformShader1i(const string variable, GLint v1)
+{
+	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniform1i(val, v1);
+}
+
+void CShader::setUniformShader2fv(const string variable, GLsizei count, const GLfloat *value)
+{
+	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniform2fv(val, count, &value[0]);
+}
+
+void CShader::setUniformShader3fv(const string variable, GLsizei count, const GLfloat *value)
+{
+	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniform3fv(val, count, &value[0]);
+}
+
+void CShader::setUniformShaderMatrix3fv(const string &variable, GLsizei count, GLboolean traspose, const GLfloat *value)
+{
+	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniformMatrix3fv(val, count, traspose, &value[0]);
+}
+
+void CShader::setUniformShaderMatrix4fv(const string variable, GLsizei count, GLboolean traspose, const GLfloat *value)
+{
+	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniformMatrix4fv(val, count, traspose, &value[0]);
+}
+
+void CShader::setUniformShaderTexture2D(const string variable, GLuint textureid)
+{
+	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniform1i(val, textureid);
+	glActiveTexture(GL_TEXTURE0 + textureid);
+	glBindTexture(GL_TEXTURE_2D, textureid);
+}
+
+

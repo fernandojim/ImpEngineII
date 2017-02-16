@@ -1,7 +1,11 @@
 #ifndef _CVAO_H_
 #define _CVAO_H_
 
-#include "gl_core_3_3.h"
+#ifdef _OPENGL44_
+ #include "gl_core_4_4.h"
+#else
+ #include "gl_core_3_3.h"
+#endif
 
 #define MAX_BUFFERS 6
 
@@ -12,6 +16,7 @@ public:
 	GLuint m_vboHandles[MAX_BUFFERS];
 
 	GLuint m_handler;
+
 public:
 	CVao();
 	~CVao();

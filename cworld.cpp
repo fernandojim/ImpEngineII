@@ -2,95 +2,83 @@
 
 #include "cworld.h"
 
-CWorld::CWorld(CCamera *c)
+using namespace RenderManager;
+using namespace GameObjectManager;
+
+CWorld::CWorld(string sz_file)
 {
-	CNode *node0, *node1; //Hierarchy nodes
-	CMesh *sub[2];        //Meshes for hierarchy level 2
-	std::vector<CObject*>::iterator it; //itterator
+	GLuint light = 0;
+	//Creates the file to read info
+	CFileDef *filedef = new CFileDef(sz_file);
 
-	//Crea luces
-	m_Lights[0].m_light.lightIntensity = glm::vec3(0.4, 0.4, 0.4);
-	m_Lights[0].m_light.ka = glm::vec3(0.4, 0.4, 0.4);
-	m_Lights[0].m_light.kd = glm::vec3(0.9, 0.9, 0.9);
-	m_Lights[0].m_light.ks = glm::vec3(0.1, 0.1, 0.1);
-	m_Lights[0].m_light.shininess = 1.0;
-	m_Lights[0].m_light.lightPosition = glm::vec3(1000.0, 1000.0, 1000.0);
-
-	//Establecemos la cámara de la escena
-	m_pCamara = c;
-	m_pCamara->position = glm::vec3(100.0, 200.0, 100.0);
-
-	//Creamos el manager de texturas y las añadimos
-	::getTextureManager().loadTexture("texturas\\sand.bmp");
-	::getTextureManager().loadTexture("texturas\\grass1024.bmp");
-	::getTextureManager().loadTexture("texturas\\dirt.bmp");
-	::getTextureManager().loadTexture("texturas\\snow.bmp");
-	::getTextureManager().loadTexture("texturas\\noise.bmp");
-	GLuint texF = ::getTextureManager().loadTexture("texturas\\fonts_A_Z_0_9.bmp");
-	
 	//Creamos las fuentes OpenGL
 	m_pFont = new CFont("shaders\\fonts.vertex", "shaders\\fonts.fragment");
-	m_pFont->setIdTexture(texF);
 
-	//Creamos la malla del terreno
-	m_pTerrain = new CTerrain("objetos\\terrain.dat");
-	m_pTerrain->SetCamera(m_pCamara);
-	m_pTerrain->SetWorld(this);
+	if (filedef->getIsOpen())
+	{
+		//Read values from file
+		filedef->readObjectKeysValues();
 
-	//Crea los nodos para cada nivel del árbol de objetos
-	node0 = new CNode();
-	m_pNodes.push_back(node0);
+		//Crea luces
+		// luz 0
+		light = std::stoi(filedef->getObjectValues("LIGHT")[light]);
 
-	//Inserta el terrain en el nivel 0
-	it = m_pNodes.at(0)->m_Objects.begin();
-	it = m_pNodes.at(0)->m_Objects.insert(it, m_pTerrain);
+		m_Lights[light].m_light.lightPosition.x = std::stof(filedef->getObjectValues("POSITION")[0]);
+		m_Lights[light].m_light.lightPosition.y = std::stof(filedef->getObjectValues("POSITION")[1]);
+		m_Lights[light].m_light.lightPosition.z = std::stof(filedef->getObjectValues("POSITION")[2]);
 
-	sub[0] = new CMesh("House", "objetos\\avion.obj", "shaders\\mesh1.vertex", "shaders\\mesh1.fragment");
-	sub[0]->m_position = glm::vec3(0.0, 0.0, 0.0);
-	sub[0]->m_scale = glm::vec3(10.0, 10.0, 10.0);
-	sub[0]->SetWorld(this);
-	sub[0]->SetCamera(m_pCamara);
-	sub[0]->m_pParent = m_pTerrain;
+		m_Lights[light].m_light.lightIntensity.x = std::stof(filedef->getObjectValues("INTENSITY")[0]);
+		m_Lights[light].m_light.lightIntensity.y = std::stof(filedef->getObjectValues("INTENSITY")[1]);
+		m_Lights[light].m_light.lightIntensity.z = std::stof(filedef->getObjectValues("INTENSITY")[2]);
 
-	/*sub[1] = new CMesh("tank1", "objetos\\tank.obj", "shaders\\mesh1.vertex", "shaders\\mesh1.fragment");
-	sub[1]->m_position = glm::vec3(0.0, 100.0, 0.0);
-	sub[1]->m_scale = glm::vec3(10.0, 10.0, 10.0);
-	sub[1]->SetWorld(this);
-	sub[1]->SetCamera(m_pCamara);
-	sub[1]->m_pParent = m_pTerrain;*/
+		m_Lights[light].m_light.ka.x = std::stof(filedef->getObjectValues("KA")[0]);
+		m_Lights[light].m_light.ka.y = std::stof(filedef->getObjectValues("KA")[1]);
+		m_Lights[light].m_light.ka.z = std::stof(filedef->getObjectValues("KA")[2]);
 
-	//Inserta objetos en el nivel 1
-	node1 = new CNode();
-	m_pNodes.push_back(node1);
-	it = m_pNodes.at(1)->m_Objects.begin();
-	it = m_pNodes.at(1)->m_Objects.insert(it, sub[0]);
-	//it = m_pNodes.at(1)->m_Objects.insert(it, sub[1]);
+		m_Lights[light].m_light.kd.x = std::stof(filedef->getObjectValues("KD")[0]);
+		m_Lights[light].m_light.kd.y = std::stof(filedef->getObjectValues("KD")[1]);
+		m_Lights[light].m_light.kd.z = std::stof(filedef->getObjectValues("KD")[2]);
+
+		m_Lights[light].m_light.ks.x = std::stof(filedef->getObjectValues("KS")[0]);
+		m_Lights[light].m_light.ks.y = std::stof(filedef->getObjectValues("KS")[1]);
+		m_Lights[light].m_light.ks.z = std::stof(filedef->getObjectValues("KS")[2]);
+
+		m_Lights[light].m_light.shininess = std::stof(filedef->getObjectValues("SHININESS")[0]);
+	}
+
+	//Establecemos la cámara de la escena
+	m_pCamara = new CCamera(std::stoi(filedef->getObjectValues("CAM_ASPECT")[0]),  // width
+							std::stoi(filedef->getObjectValues("CAM_ASPECT")[1]),  // height
+							std::stof(filedef->getObjectValues("CAM_ASPECT")[2])); // aspect
+	m_pCamara->position = glm::vec3(std::stoi(filedef->getObjectValues("CAM_POSITION")[0]), 0.0, std::stoi(filedef->getObjectValues("CAM_POSITION")[1]));
+
+	//Create the manager of renderers
+	getRenderManager().loadShadersFromFile(filedef->getObjectValues("SHADERS")[0]);
+
+	//Create the main terrain
+	getGameObjectManager().CreateGameObject(filedef->getObjectValues("TERRAIN")[0], OBJECT_TYPE::TERRAIN, OBJECT_HIERARCHY_LEVEL::LEVEL_0, 0, 0x0, m_pCamara, this, 0, 0, 0);
+
+	getGameObjectManager().CreateGameObject("objetos\\Array House Example_obj.obj", OBJECT_TYPE::BLENDER, OBJECT_HIERARCHY_LEVEL::LEVEL_0, 0, 0x0, m_pCamara, this, 0, 0, 0);
+	getGameObjectManager().CreateGameObject(filedef->getObjectValues("MD2")[1], OBJECT_TYPE::MD2, OBJECT_HIERARCHY_LEVEL::LEVEL_1, 0, 0x0, m_pCamara, this, 200, 100, 200);
 }
 
 void CWorld::Animate(double dt)
 {
-	//Traverses the nodes list and Animate each one
-	for (GLuint i = 0; i < m_pNodes.size(); i++)
-		m_pNodes.at(i)->Animate(dt);
+	getGameObjectManager().AnimateGameObjects(dt);
 }
 
 void CWorld::Update()
 {
-	//Traverses the nodes list and Update each one
-	for (GLuint i = 0; i < m_pNodes.size(); i++)
-		m_pNodes.at(i)->Update();
+	getGameObjectManager().UpdateGameObjects();
 }
 
 void CWorld::Draw(CCamera *c)
 {
-	//Traverses the nodes list and Draw each one
-	for (GLuint i = 0; i < m_pNodes.size(); i++)
-		m_pNodes.at(i)->Render();
+	getRenderManager().Render();
 }
 
 CWorld::~CWorld()
 {
 	delete m_pCamara;
-	delete m_pTerrain;
 	delete m_pFont;
 }

@@ -5,14 +5,16 @@
 
 #pragma once
 
-#include "targetver.h"
-
 #include <stdio.h>
 #include <tchar.h>
-#include <SDL.h>
+#include <SDL2-2.0.4\SDL.h>
 
-#include "gl_core_3_3.h"
+#ifdef _OPENGL44_
+ #include "gl_core_4_4.h"
+#else
+ #include "gl_core_3_3.h"
+#endif
 
-#define fopen_s fopen
+#define GLM_FORCE_RADIANS
 
 // TODO: reference additional headers your program requires here

@@ -1,15 +1,15 @@
 #ifndef _CCAMERA_H_
 #define _CCAMERA_H_
 
+#include "cgameobject.h"
 #include "glm\gtc\matrix_transform.hpp" //Header for glm::perspective, etc...
 #include "glm\vec3.hpp"
 #include "glm\vec2.hpp"
-#include "cobject.h"
 
-#define DEG2RAD(x) (glm::pi<float>() / 180.0 * x)
+#define DEG2RAD(x) ((float)(glm::pi<float>() / 180.0f * x))
 #define RAD2DEG(x) (180.0 / glm::pi<float>() * x)
 
-class CObject;
+class CGameObject;
 
 class CCamera 
 {
@@ -40,15 +40,12 @@ public:
 	int screenwidth, screenheight;
 	int centerX, centerY;
 
-	CCamera();
+	CCamera(int h, int w, float aspect);
 	CCamera(glm::vec3 *look);
 	CCamera(glm::vec3 *pos, glm::vec3 *look);
 	~CCamera();
 
-	void LookAtNow(CObject *object);
-	/*void LookAt(CObject *object);
-	void MoveTo(CObject *object);
-	void MoveToNow(CObject *object);*/
+	void LookAtNow(CGameObject *object);
 	void MoveToNow(float x, float y, float z);
 
 	void UpdateLookAt();

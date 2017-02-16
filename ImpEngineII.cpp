@@ -5,15 +5,14 @@
 #include "cgameengine.h"
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-//int main(int argc, char *argv[])
 {
 	int loopRet = 0;
 	CGameEngine *gameEngine = NULL;
 
 	try
 	{
-		//Creates the Game Engine
-		gameEngine = new CGameEngine("ImpEngineII", false, 800, 600, 24);
+		//Creates the Game Engine loaded by parameters file
+		gameEngine = new CGameEngine("objetos\\engine.dat");
 
 		//Enter the game engine loop
 		loopRet = gameEngine->EnterMessageLoop();

@@ -25,6 +25,7 @@ private:
 	void GameCycle(double deltaTime);
 	void OnPrepare();
 	void CheckInput(double deltaTime);
+	void Clear();
 
 	bool m_bQuit;
 
@@ -33,15 +34,20 @@ protected:
 	void OnMouseMove(int deltaX, int deltaY);
 
 public:
-	CGameEngine(const char *szName, bool fscreen, int w, int h, int b) :
-		CWOpenGL(szName, fscreen, w, h, b)
+
+	/* Constructor by file */
+	CGameEngine(const char *szfile) : CWOpenGL(szfile)
 	{
-		m_bQuit = false;
-		m_gameCamera = new CCamera();
-		m_gameWorld  = new CWorld(m_gameCamera);
-		m_gameCamera->centerX = 100;
-		m_gameCamera->centerY = 100;
+		Clear();
 	}
+
+	CGameEngine(const char *szName, bool fscreen, bool vsync, int w, int h, int b) :
+		CWOpenGL(szName, fscreen, vsync, w, h, b)
+	{
+		Clear();
+	}
+
+	/* Destructor */
 	~CGameEngine() {}
 
 	CCamera *OnGetCamera() { return m_gameCamera; }

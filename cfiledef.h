@@ -12,6 +12,13 @@ using std::string;
 #define MAX_KEYS 50
 #define MAX_SUBKEYS 5
 
+/********************
+ * DEFINITION OF KEY:
+ * {
+ *      Key value1 value2 ... value[MAX_SUBKEYS]
+ * }
+ *
+ ********************/
 typedef struct _key
 {
 	string key;
@@ -22,7 +29,10 @@ class CFileDef
 {
 public:
 	/* File of definition */
-	ifstream m_filedef;
+	ifstream m_Filedef;
+
+	/* Num of keys loaded */
+	int m_numkeys;
 
 private:
 	/* name of object */
@@ -34,13 +44,13 @@ private:
 	/* If there is an error */
 	bool m_opened;
 
-	/* Num of keys loaded */
-	int m_numkeys;
+	string GetValidLine();
 
 public:
 	/* Constructor */
-	CFileDef(const string file);
-	~CFileDef() {}
+	CFileDef(const string &file);
+	CFileDef(const string &file, bool binary);
+	~CFileDef();
 
 	bool getIsOpen();
 
@@ -48,10 +58,13 @@ public:
 	string getObjectName();
 
 	/* Gets the values from key */
-	string* getObjectValues(const string _key);
+	string* getObjectValues(const string &_key);
+
+	/* Get the keys from file */
+	string getObjectKey(int ind);
 
 	/* Gets the keys/values from file */
-	void getObjectKeysValues();
+	void readObjectKeysValues();
 };
 
 #endif

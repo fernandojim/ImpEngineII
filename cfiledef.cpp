@@ -2,21 +2,55 @@
 
 #include "cfiledef.h"
 
-CFileDef::CFileDef(const string file)
+CFileDef::CFileDef(const string &file, bool binary)
 {
-	/* m_error is true at the beginning */
+	/* Initialize m_opened */
 	m_opened = false;
 
 	/* Initialize num of keys */
 	m_numkeys = 0;
 
 	/* try to open the file */
-	m_filedef.open(file);
+	if (binary)
+		m_Filedef.open(file.c_str(), std::ifstream::in | std::ifstream::binary);
+	else
+		m_Filedef.open(file.c_str());
 
 	/* if there is an error opening the file */
-	if (m_filedef.good() && !m_filedef.eof())
+	if (m_Filedef.good() && !m_Filedef.eof())
 	{
 		m_opened = true;
+	}
+}
+
+CFileDef::CFileDef(const string &file)
+{
+	/* Initialize m_opened */
+	m_opened = false;
+
+	/* Initialize num of keys */
+	m_numkeys = 0;
+
+	/* try to open the file */
+	m_Filedef.open(file.c_str());
+
+	/* if there is an error opening the file */
+	if (m_Filedef.good() && !m_Filedef.eof())
+	{
+		m_opened = true;
+	}
+}
+
+/*
+	Destructor: Close and delete object
+ */
+CFileDef::~CFileDef()
+{
+	if ( m_Filedef && m_opened )
+	{
+		/* Close the file stream */
+		m_Filedef.close();
+		m_opened = false;
 	}
 }
 
@@ -38,17 +72,17 @@ key key_value
 	...
 }
 */
-void CFileDef::getObjectKeysValues()
+void CFileDef::readObjectKeysValues()
 {
 	GLuint i = 0;
 	std::string line;
 			
 	if (m_opened)
 	{
-		while (m_filedef.good() && !m_filedef.eof())
+		while (m_Filedef.good() && !m_Filedef.eof())
 		{
 			/* get line from file and stores into buffer */
-			std::getline(m_filedef, line);
+			std::getline(m_Filedef, line);
 			
 			/* ignores '#' '\n' '{' or '\0' characters */
 			if (line.size() != 0 && line.at(0) != '#' && line.at(0) != '\n' && line.at(0) != '\0')
@@ -63,13 +97,13 @@ void CFileDef::getObjectKeysValues()
 				}
 				
 				//Get next line
-				std::getline(m_filedef, line);
+				std::getline(m_Filedef, line);
 
 				// Inits
 				if (line.at(0) == '{')
 				{
-					//Next line
-					std::getline(m_filedef, line);
+					//Next line discarding empty or comments
+					line = GetValidLine();
 
 					//Read and format data
 					while (line.at(0) != '}')
@@ -80,9 +114,11 @@ void CFileDef::getObjectKeysValues()
 							m_keys[m_numkeys].values[i].erase();
 
 						//Get the main key
-						std::stringstream(line) >> m_keys[m_numkeys].key;
-						line = line.substr(m_keys[m_numkeys].key.length() + 2, line.length());
+						std::stringstream (line) >> m_keys[m_numkeys].key;
 						
+						if (m_keys[m_numkeys].key.length() + 2 < line.length()) //Avoid error
+							line = line.substr(m_keys[m_numkeys].key.length() + 2, line.length());
+
 						//Get the subkeys if exist
 						i = 0;
 						while (std::stringstream(line) >> m_keys[m_numkeys].values[i])
@@ -99,18 +135,45 @@ void CFileDef::getObjectKeysValues()
 						//Next key/values
 						m_numkeys++;
 
-						//Next line
-						std::getline(m_filedef, line);
+						//Next line discarding empty or comments
+						line = GetValidLine();
 					}
 				}
 			}
 		}
 
-		/* Close the file stream */
-		m_filedef.close();
-		m_opened = false;
+		m_Filedef.close();
 	}
 }
+
+string CFileDef::GetValidLine()
+{
+	string line = "";
+
+	while (m_Filedef.good() && !m_Filedef.eof())
+	{
+		std::getline(m_Filedef, line);
+
+		//Test if line is empty
+		if (line.size() >= 1)
+		{
+			if (line.at(0) == '}')
+				return line;
+		}
+
+		if (line.size() >= 2)
+		{
+			//Discard comments
+			if (line.at(0) != '#' && line.at(1) != '#')
+			{
+				return line;
+			}
+		}
+	}
+
+	return line;
+}
+
 
 /*
 	Get the name into object file
@@ -123,7 +186,7 @@ string CFileDef::getObjectName()
 /* 
 	Get the value associated to key 
 */
-string* CFileDef::getObjectValues(const string _key)
+string* CFileDef::getObjectValues(const string &_key)
 {
 	for (int i = 0; i < m_numkeys; i++)
 	{
@@ -135,3 +198,17 @@ string* CFileDef::getObjectValues(const string _key)
 
 	return NULL;
 }
+
+/*
+	Get the keys i
+ */
+string CFileDef::getObjectKey(int ind)
+{
+	if (m_keys[ind].key.length() > 0)
+	{
+		return m_keys[ind].key;
+	}
+
+	return NULL;
+}
+

@@ -5,7 +5,11 @@
 #include <fstream>
 #include <cassert>
 
-#include "gl_core_3_3.h"
+#ifdef _OPENGL44_
+ #include "gl_core_4_4.h"
+#else
+ #include "gl_core_3_3.h"
+#endif
 
 #include "cbmp.h"
 
@@ -19,7 +23,11 @@ private:
 	unsigned int m_ID;			//Texture id in OpengGL context
 	std::string  m_filename;	//Texture file name
 	bool         m_error;		//If there is an error
-	CBmp	    *m_Bmp;
+
+	//Generic info for texture image
+	long         m_lHeight;
+	long         m_lWidth;
+	BYTE        *m_Pixeldata;
 
 public:
 	CTexture(std::string sFilename);	//Constructor

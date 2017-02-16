@@ -5,19 +5,21 @@
 #include <math.h>
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp" //Header for glm::perspective, etc...
-#include "glm/gtc/type_ptr.hpp"	
+#include "glm/gtc/type_ptr.hpp"
+
+#include "texturemanager.h"
+
+using namespace TextureManager;
 
 CFont::CFont(const char *vs, const char *fs)
 {
-	int i = 0;
-	int j = 0;
-	int x = 0;
-	int y = 0;
-
 	//Inicializa los arrays
 	m_Vertex = new Vertex2[N_VERTEX];
 	m_Texel = new Vertex2[N_VERTEX];
 	m_Index = new GLuint[N_VERTEX];
+
+	m_count = 0;
+	m_uiTextura = 0;
 
 	/* Crea lista de vértice del quadrado */
 	m_Vertex[0].x = 0.0;
@@ -49,6 +51,9 @@ CFont::CFont(const char *vs, const char *fs)
 
 	m_pVAO->CreateArrayBuffer(m_Texel, N_VERTEX * sizeof(Vertex2), GL_STREAM_DRAW);
 	m_pVAO->CreateAttribArrayBuffer(4, 2);
+
+	//Carga la textura
+	m_uiTextura = ::getTextureManager().loadTexture("texturas\\fonts_A_Z_0_9.bmp");
 }
 
 CFont::~CFont()
@@ -62,7 +67,6 @@ void CFont::Render(string text)
 	GLuint chr;
 	GLuint base;
 	GLushort ix, iy;
-	int num_fonts = 0;
 	static DWORD initCount = 0;
 	int despx = 0;
 	int despy = 0;
@@ -75,10 +79,11 @@ void CFont::Render(string text)
 		m_text = text;
 		initCount = m_count;
 	}
-	
-	num_fonts = text.length();
+
+	glUseProgram(m_pShader->m_uiProgram);
+
 	//Renderiza si el tamaño del texto es mayor que 0
-	for (int i = 0; i < m_text.length(); i++)
+	for (GLuint i = 0; i < m_text.length(); i++)
 	{
 		//Obtenemos el código del carácter a dibujar
 		chr = m_text.at(i);
@@ -110,7 +115,7 @@ void CFont::Render(string text)
 			else
 				ix = chr - 65; //Mayúsculas
 		}
-		else if (chr == 45)	//guión
+		else if (chr == 45)	   //guión
 		{
 			ix = 1;
 			iy = 2;
@@ -150,26 +155,22 @@ void CFont::Render(string text)
 		glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 100.0f, -100.0f);
 		glm::mat4 mvp = projection * view * model;
 
-		glUseProgram(m_pShader->m_uiProgram);
-		{
-			//Get the texture id
-			glActiveTexture(GL_TEXTURE0 + m_uiTextura);
-			glBindTexture(GL_TEXTURE_2D, m_uiTextura);
-			glUniform1i(glGetUniformLocation(m_pShader->m_uiProgram, "texturaFonts"), m_uiTextura);
+		//Get the texture id
+		glActiveTexture(GL_TEXTURE0 + m_uiTextura);
+		glBindTexture(GL_TEXTURE_2D, m_uiTextura);
+		glUniform1i(glGetUniformLocation(m_pShader->m_uiProgram, "texturaFonts"), m_uiTextura);
 
-			//Matrix de transformación
-			base = glGetUniformLocation(m_pShader->m_uiProgram, "mvp");
-			glUniformMatrix4fv(base, 1, GL_FALSE, glm::value_ptr(mvp));
+		//Matrix de transformación
+		base = glGetUniformLocation(m_pShader->m_uiProgram, "mvp");
+		glUniformMatrix4fv(base, 1, GL_FALSE, glm::value_ptr(mvp));
 
-			//glBindVertexArray(m_pVAO->m_vaoHandle);
-			glBindVertexArray(m_pVAO->m_vaoHandle);
-			glDrawElements(GL_TRIANGLE_STRIP, N_VERTEX, GL_UNSIGNED_INT, &m_Index[0]);
-			glBindVertexArray(0);
-		}
-		glUseProgram(0);
+		//glBindVertexArray(m_pVAO->m_vaoHandle);
+		glBindVertexArray(m_pVAO->m_vaoHandle);
+		glDrawElements(GL_TRIANGLE_STRIP, N_VERTEX, GL_UNSIGNED_INT, &m_Index[0]);
+		glBindVertexArray(0);
 
 		despx++;
-	} //End-for (int i = 0; i < m_iNumFonts; i++)
+	} //End-for (GLuint i = 0; i < m_iNumFonts; i++)
 }
 
 void CFont::setIdTexture(GLuint id)

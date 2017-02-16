@@ -4,7 +4,7 @@
 
 #include <glm\gtc\matrix_inverse.hpp>
 
-CCamera::CCamera()
+CCamera::CCamera(int h, int w, float aspect)
 {
 	position = glm::vec3(0.0, 0.0, 0.0);
 	lookAt = glm::vec3(0.0, 0.0, 1.0);
@@ -17,14 +17,20 @@ CCamera::CCamera()
 	acceleration = glm::vec3(0.0, 0.0, 0.0);
 	vectorVelocidad = glm::vec3(0.0, 0.0, 0.0);
 
+	screenwidth = 0;
+	screenheight = 0;
+	centerX = 0;
+	centerY = 0;
+
 	yaw = 0.0;
 	pitch = 0.0;
 
-	m_M4model = glm::mat4(1.0);
 	m_M4view = glm::mat4(1.0);
 	m_M4projection = glm::mat4(1.0);
 	m_M3normal = glm::mat3(1.0);
 	m_M4MVP = glm::mat4(1.0);
+	m_M4model = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
+	m_M4projection = glm::perspective(glm::radians(aspect), (float)h/w, 0.1f, 8000.0f);
 }
 
 CCamera::CCamera(glm::vec3 *look)
@@ -41,6 +47,11 @@ CCamera::CCamera(glm::vec3 *look)
 	velocity = glm::vec3(0.0, 0.0, 0.0);
 	acceleration = glm::vec3(0.0, 0.0, 0.0);
 	vectorVelocidad = glm::vec3(0.0, 0.0, 0.0);
+
+	screenwidth = 0;
+	screenheight = 0;
+	centerX = 0;
+	centerY = 0;
 
 	yaw = 0.0;
 	pitch = 0.0;
@@ -59,12 +70,18 @@ CCamera::CCamera(glm::vec3 *pos, glm::vec3 *look)
 	acceleration = glm::vec3(0.0, 0.0, 0.0);
 	vectorVelocidad = glm::vec3(0.0, 0.0, 0.0);
 
+	screenwidth = 0;
+	screenheight = 0;
+	centerX = 0;
+	centerY = 0;
+
 	yaw = 0.0;
 	pitch = 0.0;
 }
 
 CCamera::~CCamera()
 {
+
 }
 
 void CCamera::UpdateLookAt()
@@ -148,7 +165,7 @@ void CCamera::MoveToNow(float x, float y, float z)
 	position.z = z;
 }
 
-void CCamera::LookAtNow(CObject *object)
+void CCamera::LookAtNow(CGameObject *object)
 {
 	lookAt = object->m_position;
 }
@@ -239,23 +256,19 @@ void CCamera::Animate(double deltaTime)
 	vectorVelocidad = glm::normalize(lookAt - position) * glm::length(velocity);
 	vectorVelocidad.y = 0.0;
 
-	/*position.x = 7000.0;
-	position.y = 2000.0;
-	position.z = 7000.0;
+	/*position.x = 500.0;
+	position.y = 200.0;
+	position.z = 150.0;
 
 	lookAt.x = 0.0;
 	lookAt.y = 0.0;
 	lookAt.z = 0.0;*/
 
-	m_M4model = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
-	m_M4view = glm::lookAt(position, lookAt, up);
-	m_M4projection = glm::perspective(50.0f, 1920.0f / 1200.0f, 1.0f, 8000.0f);
-
 	//Calcula matriz modelview
+	m_M4view = glm::lookAt(position, lookAt, up);
 	m_M4modelView = m_M4view * m_M4model;
 
 	//Matrix normal
-	//m_M3normal = glm::transpose(glm::inverse(glm::mat3(m_M4modelView)));
 	m_M3normal = glm::inverseTranspose(glm::mat3(m_M4modelView));
 
 	//Importante el orden de las transformaciones: MVP = proj * view * model

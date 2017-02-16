@@ -3,7 +3,7 @@
 
 #include "glm\vec3.hpp"
 
-typedef struct light
+struct light
 {
 	glm::vec3 lightPosition;
 	glm::vec3 lightIntensity;

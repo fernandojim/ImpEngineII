@@ -5,7 +5,12 @@
 
 namespace ansiCToUnicode
 {
-	std::wstring ansiCToUnicode(char *z_c);
+	std::wstring ansiCToUnicode(const char *z_c);
+}
+
+namespace Message
+{
+	void MessageBOX(const char* title, const char* message);
 }
 
 #endif

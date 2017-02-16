@@ -1,6 +1,20 @@
 #include "stdafx.h"
 
 #include "cgameengine.h"
+#include "gameobjectmanager.h"
+
+using namespace GameObjectManager;
+
+void CGameEngine::Clear()
+{
+	m_gameTimer = NULL;
+	m_gameCamera = NULL;
+	m_gameWorld = NULL;
+	m_bQuit = false;
+
+	m_gameWorld  = new CWorld(m_sWorldFile);
+	m_gameCamera = m_gameWorld->m_pCamara;
+}
 
 void CGameEngine::OnPrepare()
 {
@@ -33,34 +47,19 @@ void CGameEngine::CheckInput(double deltaTime)
 	if (m_arrbKeys[SDL_SCANCODE_D])
 		OnKeyDown(SDLK_d);
 
-	/* Keys for light - Specular */
+	/* Keys for move the entity */
 	if (m_arrbKeys[SDL_SCANCODE_T])
 		OnKeyDown(SDLK_t);
 	
 	if (m_arrbKeys[SDL_SCANCODE_G])
 		OnKeyDown(SDLK_g);
 
-	/* Keys for light - Ambient */
-	if (m_arrbKeys[SDL_SCANCODE_Y])
-		OnKeyDown(SDLK_y);
+	if (m_arrbKeys[SDL_SCANCODE_F])
+		OnKeyDown(SDLK_f);
 
 	if (m_arrbKeys[SDL_SCANCODE_H])
 		OnKeyDown(SDLK_h);
 
-	/* Keys for light - Diffuse */
-	if (m_arrbKeys[SDL_SCANCODE_U])
-		OnKeyDown(SDLK_u);
-
-	if (m_arrbKeys[SDL_SCANCODE_J])
-		OnKeyDown(SDLK_j);
-
-	/* Keys for light - Shininess */
-	if (m_arrbKeys[SDL_SCANCODE_I])
-		OnKeyDown(SDLK_i);
-
-	if (m_arrbKeys[SDL_SCANCODE_K])
-		OnKeyDown(SDLK_k);
-	
 	/* Exit */
 	if (m_arrbKeys[SDL_SCANCODE_ESCAPE])
 		OnKeyDown(SDLK_ESCAPE);
@@ -96,52 +95,24 @@ void CGameEngine::OnKeyDown(SDL_Keycode key)
 			m_gameCamera->velocity += glm::vec3(2.0, 0.0, 0.0);
 	}
 
-	//luz specular+
 	if (key == SDLK_t)
 	{
-		m_gameWorld->m_Lights[0].m_light.ks += 0.05;
+		::getGameObjectManager().m_GameObjectsMD2.at(0).m_velocity = glm::vec3(16.0, 16.0, 16.0);
 	}
 
-	//luz specular-
 	if (key == SDLK_g)
 	{
-		m_gameWorld->m_Lights[0].m_light.ks -= 0.05;
+
 	}
 
-	//luz ambient+
-	if (key == SDLK_y)
+	if (key == SDLK_f)
 	{
-		m_gameWorld->m_Lights[0].m_light.ka += 0.05;
+		::getGameObjectManager().m_GameObjectsMD2.at(0).m_angle += 0.1;
 	}
 
-	//luz specular-
 	if (key == SDLK_h)
 	{
-		m_gameWorld->m_Lights[0].m_light.ka -= 0.05;
-	}
-
-	//luz diffuse+
-	if (key == SDLK_u)
-	{
-		m_gameWorld->m_Lights[0].m_light.kd += 0.05;
-	}
-
-	//luz diffuse-
-	if (key == SDLK_j)
-	{
-		m_gameWorld->m_Lights[0].m_light.kd -= 0.05;
-	}
-
-	//luz shininess+
-	if (key == SDLK_i)
-	{
-		m_gameWorld->m_Lights[0].m_light.shininess += 0.05;
-	}
-
-	//luz shininess-
-	if (key == SDLK_k)
-	{
-		m_gameWorld->m_Lights[0].m_light.shininess -= 0.05;
+		::getGameObjectManager().m_GameObjectsMD2.at(0).m_angle -= 0.1;
 	}
 
 	// Tecla ESC

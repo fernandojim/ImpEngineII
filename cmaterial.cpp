@@ -17,23 +17,23 @@
 #include "stdafx.h"
 
 #include "cmaterial.h"
-
 #include "cfiledef.h"
-#include "globals.h"
+#include "texturemanager.h"
 
-using namespace GLOBALS;
+using namespace TextureManager;
 
-#define SZ_NEWMTL sizeof("newmtl")-1
-#define SZ_NS     sizeof("Ns")-1
-#define SZ_KA     sizeof("Ka")-1
-#define SZ_KD     sizeof("Kd")-1
-#define SZ_KS     sizeof("Ks")-1
-#define SZ_NI     sizeof("Ni")-1
-#define SZ_D      sizeof("d")-1
-#define SZ_ILLUM  sizeof("illum")-1
-#define SZ_MAPKD  sizeof("map_Kd")-1
-#define SZ_MAPKS  sizeof("map_Ks")-1
-#define SZ_MAPKA  sizeof("map_Ka")-1
+#define SZ_NEWMTL  sizeof("newmtl")-1
+#define SZ_NS      sizeof("Ns")-1
+#define SZ_KA      sizeof("Ka")-1
+#define SZ_KD      sizeof("Kd")-1
+#define SZ_KS      sizeof("Ks")-1
+#define SZ_NI      sizeof("Ni")-1
+#define SZ_D       sizeof("d")-1
+#define SZ_ILLUM   sizeof("illum")-1
+#define SZ_MAPKD   sizeof("map_Kd")-1
+#define SZ_MAPKS   sizeof("map_Ks")-1
+#define SZ_MAPKA   sizeof("map_Ka")-1
+#define SZ_MAPBUMP sizeof("map_Bump")-1
 
 using namespace std;
 
@@ -41,16 +41,17 @@ CMaterial::CMaterial(std::string file)
 {
 	std::string aux[4];
 	std::string line;
-	CFileDef *filedef = new CFileDef("objetos\\"+file);
-	GLuint mat = 0;
 
-	/* if exist */
-	if (filedef && filedef->getIsOpen())
+	//Creates the file to read info
+	CFileDef *filedef = new CFileDef("objetos\\"+file);
+
+	// if exist
+	if (filedef->getIsOpen())
 	{
-		while (!filedef->m_filedef.eof())
+		while (!filedef->m_Filedef.eof())
 		{
 			/* get line from file and stores into buffer */
-			std::getline(filedef->m_filedef, line);
+			std::getline(filedef->m_Filedef, line);
 
 			/* ignores '#' '\n' '{' or '\0' characters */
 			if (line.size() != 0 && line.at(0) != '#' && line.at(0) != '\n' && line.at(0) != '\0')
@@ -102,28 +103,45 @@ CMaterial::CMaterial(std::string file)
 					std::stringstream(line) >> aux[0] >> aux[1];
 					m_iIllum = std::stoi(aux[1]);
 				}
+				else if (!line.compare(0, SZ_MAPBUMP, "map_Bump"))
+				{
+					m_sMap_Bump = line.substr(9, line.length());
+					m_iMap_Bump_texture = ::getTextureManager().loadTexture(m_sMap_Bump);
+				}
 				else if (!line.compare(0, SZ_MAPKA, "map_Ka"))
 				{
-					std::stringstream(line) >> aux[0] >> aux[1];
-					m_sMap_ka = aux[1];
+					m_sMap_ka = line.substr(7, line.length());
 					m_iMap_ka_texture = ::getTextureManager().loadTexture(m_sMap_ka);
 				}
 				else if (!line.compare(0, SZ_MAPKD, "map_Kd"))
 				{
-					std::stringstream(line) >> aux[0] >> aux[1];
-					m_sMap_kd = aux[1];
+					m_sMap_kd = line.substr(7, line.length());
 					m_iMap_kd_texture = ::getTextureManager().loadTexture(m_sMap_kd);
 				}
 				else if (!line.compare(0, SZ_MAPKS, "map_Ks"))
 				{
-					std::stringstream(line) >> aux[0] >> aux[1];
-					m_sMap_ks = aux[1];
+					m_sMap_ks = line.substr(7, line.length());
 					m_iMap_ks_texture = ::getTextureManager().loadTexture(m_sMap_ks);
 				}
 			}
 		}
 	}
 }
+
+CMaterial::CMaterial()
+{
+	clear();
+}
+
+void CMaterial::clear()
+{
+	m_sName = "";
+	m_iMap_ka_texture = 0;
+	m_iMap_ks_texture = 0;
+	m_iMap_kd_texture = 0;
+	m_iMap_Bump_texture = 0;
+}
+
 
 CMaterial::~CMaterial()
 {

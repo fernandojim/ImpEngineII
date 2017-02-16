@@ -1,6 +1,9 @@
 #ifndef _CTERRAIN_H_
 #define _CTERRAIN_H_
 
+#include <string>
+
+#include "cgameobject.h"
 #include "glm\vec3.hpp"
 #include "glm\vec2.hpp"
 #include "glm/gtc/type_ptr.hpp"	//Header for glm::value_ptr
@@ -9,25 +12,14 @@
 #include "ccamera.h"
 #include "cworld.h"
 #include "cfiledef.h"
-#include "cobject.h"
 #include "nvertex.h"
 #include "clight.h"
 
-#define NUM_TEXTURAS 4
-#define SAND  1
-#define GRASS 2
-#define DIRT  3
-#define SNOW  4
-
-class CBmp;
-class CShader;
-class CVao;
-class CFileDef;
-class CWorld;
-
 using namespace NVERTEX;
 
-class CTerrain : public CObject
+#define MAX_TEXTURES 5
+
+class CTerrain : public CGameObject
 {
 public:
 	string m_vs;
@@ -41,34 +33,33 @@ public:
 
 	CFileDef *m_File;
 
-	bool addTexture(GLuint id);
-
-private:
 	//Bmp con el mapa DTED2 para las alturas
 	CBmp	  *m_pHeightMap;
-		
-	CCamera	   *m_camera;
 
-	CWorld     *m_world;
+	bool addTexture(GLuint id);
 
-	//Geometric info
-	GLuint      m_iNumVertex;
-	GLuint		m_iNumIndex;
-	Vertex3*    m_Vertex;
-	Vertex2*    m_Texel;
-	Vertex3*    m_Normal;
-	GLuint*     m_Index;
-		               
 public:
-	//Métodos
-	CTerrain(const char *file);
-    CTerrain(const char* vs, const char* fs, float ancho, float largo, float altura, float tilingfactor, char *sTexturaHeightfield);
+	//Used textures id
+	GLuint      m_SandTextureId;
+	GLuint      m_GrassTextureId;
+	GLuint      m_DirtTextureId;
+	GLuint      m_SnowTextureId;
+
+	//Tiling texture factors
+	GLfloat		m_tilingFactorSand;
+	GLfloat		m_tilingFactorGrass;
+	GLfloat		m_tilingFactorDirt;
+	GLfloat		m_tilingFactorSnow;
+
+	//Texture file names
+	std::string		m_SandTexture;
+	std::string     m_GrassTexture;
+	std::string     m_DirtTexture;
+	std::string     m_SnowTexture;
+
+public:
+	CTerrain(const string file);
     ~CTerrain();
-
-	void     SetCamera(CCamera *c)  { m_camera = c; }
-	CCamera* getCamera()		    { return m_camera; }
-
-	void	 SetWorld(CWorld *w)    { m_world = w; }
 
 	void    setLights(CLight *lights);
 
@@ -81,19 +72,11 @@ public:
 	glm::vec3 getNormalAtPos(glm::vec3 pos);
 	float   getFronteraX();
 	float   getFronteraZ();
-
-	Vertex3*	getVertex();
-	Vertex3*	getNormal();
-	Vertex2*	getTexel();
-	GLuint*     getIndices();
-	GLuint		getNumVertex();
-				
 	float   CalculaAlturaMax();
-	Vertex3 CalculaNormalVertice(GLuint iVertice);
+	glm::vec3 CalculaNormalVertice(GLuint iVertice);
 
 	void Animate(double dt);
 	void Update();
-	void Render();
 };
 
 #endif

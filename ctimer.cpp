@@ -4,8 +4,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
+#include <iostream>
+#include <sstream>
 
 #include "ctimer.h"
+
+using namespace std;
 
 CTimer::CTimer() 
 { 
@@ -104,7 +108,11 @@ int CTimer::igetFPS()
 
 std::string CTimer::sgetFPS()
 {
-	return std::to_string(m_iFps);
+	stringstream ss;
+
+	ss << m_iFps;
+
+	return ss.str();
 }
 
 double CTimer::getElapsedSeconds()
