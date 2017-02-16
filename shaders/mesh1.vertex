@@ -1,0 +1,25 @@
+#version 330 core
+
+layout(location = 5) in vec3 Vertex;
+layout(location = 6) in vec2 Texel;
+layout(location = 7) in vec3 Normal;
+
+uniform mat4 m4mvp;       //Model View Projection matrix
+uniform mat4 m4modelview; //Model View matrix
+uniform mat3 m3normal;    //Normal matrix
+
+out VS_OUT
+{
+	vec3 eyeCoord;
+	vec3 eyeNormal;
+	vec2 varyingTexCoord;
+} vs_out;
+
+void main()
+{
+	vs_out.eyeNormal = normalize(m3normal * Normal);
+    vs_out.eyeCoord = vec3(m4modelview * vec4(Vertex, 1.0));
+    vs_out.varyingTexCoord = Texel;
+	
+	gl_Position =  m4mvp * vec4(Vertex, 1.0);
+}

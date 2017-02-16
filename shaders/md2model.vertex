@@ -1,0 +1,41 @@
+#version 330 core
+
+layout(location = 8)  in vec3 Vertex;
+layout(location = 9)  in vec3 NextVertex;
+layout(location = 10) in vec3 Normal;
+layout(location = 11) in vec3 NextNormal;
+layout(location = 12) in vec2 Texel;
+
+uniform mat4 m4mvp;       //Model View Projection matrix
+uniform mat4 m4modelview; //Model View matrix
+uniform mat3 m3normal;    //Normal matrix
+
+uniform float fInterpolation;
+
+out VS_OUT
+{
+	vec3 eyeCoord;
+	vec3 eyeNormal;
+	vec2 varyingTexCoord;
+} vs_out;
+
+void main()
+{
+    vec3 vInterpolatedPosition = Vertex;
+    vec3 vInterpolatedNormal   = Normal;
+  	
+  	if (fInterpolation >= 0.0f)
+  	{
+  	    //Interpolate position
+  		vInterpolatedPosition += (NextVertex - Vertex) * fInterpolation;
+  	    vs_out.eyeCoord = vec3(m4modelview * vec4(vInterpolatedPosition, 1.0));
+  	    
+  	    //Interpolate Normal
+  	    vInterpolatedNormal += (NextNormal - Normal) * fInterpolation;
+  	    vs_out.eyeNormal = normalize(m3normal * vInterpolatedNormal);
+  	}
+  	
+    vs_out.varyingTexCoord = Texel;
+	
+	gl_Position =  m4mvp * vec4(vInterpolatedPosition, 1.0);
+}

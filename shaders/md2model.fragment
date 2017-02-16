@@ -1,0 +1,37 @@
+#version 330
+
+out vec4 vFragColor;
+
+struct light
+{
+	vec3 lightPosition;
+	vec3 lightIntensity;
+	vec3 ka;
+	vec3 kd;
+	vec3 ks;
+	float shininess;
+};
+
+uniform light luz1;
+
+uniform sampler2D textureMeshDiffuse;
+
+in VS_OUT
+{
+	vec3 eyeCoord;
+	vec3 eyeNormal;
+	vec2 varyingTexCoord;
+} fs_in;
+
+void main()
+{
+	vec3 n = normalize( fs_in.eyeNormal );
+    vec3 s = normalize( luz1.lightPosition - fs_in.eyeCoord );
+    vec3 v = normalize( -fs_in.eyeCoord );
+	vec3 r = reflect( -s, n );
+	vec3 h = normalize( v + s );
+
+	vFragColor = texture(textureMeshDiffuse, fs_in.varyingTexCoord);
+
+	vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, fs_in.eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);
+}

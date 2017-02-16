@@ -1,0 +1,15 @@
+#version 330 core
+
+layout(location = 3) in vec2 Vertex;
+layout(location = 4) in vec2 Texel;
+
+out vec2 varyingTexel;
+
+uniform mat4 mvp;
+
+void main()
+{
+	varyingTexel = Texel;
+
+	gl_Position =  mvp * vec4(Vertex, 0.0, 1.0);
+}

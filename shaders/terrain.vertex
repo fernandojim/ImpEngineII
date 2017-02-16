@@ -1,0 +1,26 @@
+#version 330 core
+
+layout (location = 0) in vec3 Vertex;
+layout (location = 1) in vec3 Normal;
+layout (location = 2) in vec2 Texel;
+
+uniform mat3 m3normal;    //Normal matrix
+uniform mat4 m4modelview; //Model-view matrix
+uniform mat4 m4mvp;       //Model View Projection matrix
+
+out vec2 varyingTexCoord;
+out float altura;
+
+smooth out vec3 eyeCoord;
+smooth out vec3 eyeNormal;
+
+void main()
+{
+	eyeNormal = normalize(m3normal * Normal);
+    eyeCoord = vec3(m4modelview * vec4(Vertex, 1.0));
+	
+	varyingTexCoord = Texel;
+	altura = Vertex.y;
+
+	gl_Position =  m4mvp * vec4(Vertex, 1.0);
+}

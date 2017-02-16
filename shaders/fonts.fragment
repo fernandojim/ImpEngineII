@@ -1,0 +1,15 @@
+#version 330 core
+
+out vec4 vFragColor;
+
+in vec2 varyingTexel;
+
+uniform sampler2D texturaFonts;
+
+void main()
+{
+	vFragColor = texture(texturaFonts, varyingTexel);
+	
+	if ( vFragColor.rgb == vec3(0.0, 0.0, 0.0) )
+		discard;
+}

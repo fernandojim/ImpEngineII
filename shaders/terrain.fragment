@@ -1,0 +1,60 @@
+#version 330 core
+
+out vec4 vFragColor;
+
+struct light
+{
+	vec3 lightPosition;
+	vec3 lightIntensity;
+	vec3 ka;
+	vec3 kd;
+	vec3 ks;
+	float shininess;
+};
+
+uniform float altmax;
+uniform float tilingfactor;
+uniform light luz1;
+
+in vec2 varyingTexCoord;
+in float altura;
+
+smooth in vec3 eyeCoord;
+smooth in vec3 eyeNormal;
+
+uniform float tilingFactorSand;
+uniform float tilingFactorGrass;
+uniform float tilingFactorDirt;
+uniform float tilingFactorSnow;
+
+uniform sampler2D texturasand;
+uniform sampler2D texturagrass;
+uniform sampler2D texturadirt;
+uniform sampler2D texturasnow;
+
+void main()
+{
+	vec4 colorsand = texture(texturasand, varyingTexCoord * tilingFactorSand);
+	vec4 colorgrass = texture(texturagrass, varyingTexCoord * tilingFactorGrass);
+	vec4 colordirt = texture(texturadirt, varyingTexCoord * tilingFactorDirt);
+	vec4 colorsnow = texture(texturasnow, varyingTexCoord * tilingFactorSnow);
+			
+	if ( altura >= 0.0 && altura <= 100.0 )
+		vFragColor = colorgrass;
+	else if ( altura <= 250.0 )
+		vFragColor = mix(colorgrass, colordirt, smoothstep(150.0, 250.0, altura));
+	else if ( altura >= 250.0 && altura <= 400.0 )
+		vFragColor = colordirt;
+	else if ( altura >= 400.0 && altura <= 700.0 )
+		vFragColor = mix(colordirt, colorsnow, smoothstep(400.0, 700.0, altura));
+	else
+		vFragColor = colorsnow;
+
+	vec3 n = normalize( eyeNormal );
+    vec3 s = normalize( luz1.lightPosition - eyeCoord );
+    vec3 v = normalize( -eyeCoord );
+	vec3 r = reflect( -s, n );
+	vec3 h = normalize( v + s );
+	
+	vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);	
+}
