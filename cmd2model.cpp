@@ -12,6 +12,10 @@
 using namespace ansiCToUnicode;
 using namespace TextureManager;
 
+ofstream salida;
+
+bool first = true;
+
 //----------------------------------------
 // Constructor
 //----------------------------------------
@@ -35,10 +39,17 @@ CMd2model::CMd2model(const string s_filename)  : CGameObject()
 	setState(md2_state_t::STAND1);
 
 	//Geometry initializations
-	m_angle = 0.0;
-	m_facing = glm::vec3(1.0, 0.0, 0.0); //Facing to x-axis.
+	m_angle = glm::radians(0.0);
+	m_speed = 0.0;
+	m_angles = glm::vec3(0.0, 0.0, 0.0);
+	m_qrot = glm::quat(m_angles);
+	m_qrotTo = glm::quat(m_angles);
 
 	loadMD2Model(s_filename);
+
+	m_walkingTo = false;
+
+	salida.open("salida.txt", std::ifstream::binary|std::ifstream::trunc);
 }
 
 //----------------------------------------
@@ -247,45 +258,73 @@ void CMd2model::setState(md2_state_t state)
 //
 // WALK TO A GIVEN POSITION
 //
-void CMd2model::WalkTo(glm::vec3 position)
+void CMd2model::WalkTo(glm::vec2 newPosition)
 {
-	float angle = 0.0;
+	/*float ang = 0.0;
 
-	//Set state to walk for animations
-	setState(md2_state_t::WALK);
+	glm::vec2 vto = newPosition - glm::vec2(m_position.x, m_position.z);
 
-	//Set velocity 16 units
-	m_velocity = glm::vec3(16.0, 16.0, 16.0);
+	if ( glm::length(vto) > 3.0)
+	{
+		if (!m_walkingTo)
+		{
+			if (newPosition.y > m_position.z)
+				ang = -glm::angle(glm::normalize(glm::vec2(m_facing.x, m_facing.z)), glm::normalize(vto));
+			else
+				ang = glm::angle(glm::normalize(glm::vec2(m_facing.x, m_facing.z)), glm::normalize(vto));
 
-	//Calculate the angle between the face and vector result from the objetc position to final position
-	glm::vec3 vto = position - m_position;
-	angle = glm::angle(glm::normalize(m_facing), glm::normalize(vto));
+			m_angles = glm::vec3(0.0, ang , 0.0);
+			m_qrotTo = glm::quat(m_angles);
 
-	if (m_angle > angle)
-		m_angle -= 0.01;
-	else if (m_angle < angle)
-		m_angle += 0.01;
+			m_walkingTo = true;
+			m_speed = 16.0;
+		}
+
+		m_qrot = glm::slerp(m_qrot, m_qrotTo, 0.05f);
+		if (ang < 0.0)
+			m_angle = -glm::angle(m_qrot);
+		else
+			m_angle = glm::angle(m_qrot);
+	}
+	else
+	{
+		m_walkingTo = false;
+		m_speed = 0.0;
+	}*/
+
+	salida << "m_position=(" << m_position.x << "," << m_position.z << ") angle=" << m_angle << "\n";
 }
 
 
 void CMd2model::UpdateAnimation(float dt)
 {
+	m_position.x += m_velocity.x * dt;
+	m_position.z += m_velocity.z * dt;
+
+	if (m_speed > 0.0)
+	{
+		setState(md2_state_t::WALK);
+		m_AnimateState.fps = m_speed * 0.35;
+	}
+	else
+		setState(md2_state_t::STAND1);
+
 	m_AnimateState.curr_time += dt;
 
-   if(m_AnimateState.curr_time - m_AnimateState.old_time > (1.0f / float(m_AnimateState.fps)))
-   {
-	   m_AnimateState.old_time = m_AnimateState.curr_time;
+	if(m_AnimateState.curr_time - m_AnimateState.old_time > (1.0f / float(m_AnimateState.fps)))
+	{
+		m_AnimateState.old_time = m_AnimateState.curr_time;
 
-	   m_AnimateState.curr_frame = m_AnimateState.next_frame;
-	   m_AnimateState.next_frame++;
+		m_AnimateState.curr_frame = m_AnimateState.next_frame;
+		m_AnimateState.next_frame++;
 
-      if(m_AnimateState.next_frame > m_AnimateState.endframe)
-      {
-    	  m_AnimateState.next_frame = m_AnimateState.startframe;
-      }
-   }
+		if(m_AnimateState.next_frame > m_AnimateState.endframe)
+		{
+			m_AnimateState.next_frame = m_AnimateState.startframe;
+		}
+	}
 
-   m_AnimateState.interpolation = float(m_AnimateState.fps) * (m_AnimateState.curr_time - m_AnimateState.old_time);
+	m_AnimateState.interpolation = float(m_AnimateState.fps) * (m_AnimateState.curr_time - m_AnimateState.old_time);
 }
 
 //----------------------------------------
@@ -294,5 +333,6 @@ void CMd2model::UpdateAnimation(float dt)
 CMd2model::~CMd2model()
 {
 	clear();
+	salida.close();
 }
 

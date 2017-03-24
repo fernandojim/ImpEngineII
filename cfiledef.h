@@ -57,8 +57,14 @@ public:
 	/* Gets the name of object */
 	string getObjectName();
 
+	/* Get the number of same objects */
+	int getCount(const string &_key);
+
 	/* Gets the values from key */
 	string* getObjectValues(const string &_key);
+
+	/* Gets the values from key at the 'index' position */
+	string* getObjectValuesIndex(const string &_key, int index);
 
 	/* Get the keys from file */
 	string getObjectKey(int ind);

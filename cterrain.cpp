@@ -237,14 +237,13 @@ glm::vec3 CTerrain::calculaNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
 	glm::vec3 vector1;
 	glm::vec3 vector2;
-	glm::vec3 vector3;
 
 	/* Creamos los vectores según los puntos introducidos */
 	vector1 = p2 - p1;
     vector2 = p3 - p1;
 
 	/* El producto vectorial entre dos vectores es la normal al plano que forman */
-	return glm::normalize(glm::cross(vector2, vector3));
+	return glm::normalize(glm::cross(vector1, vector2));
 }
 
 void CTerrain::obtieneIndicesTriangulo(glm::vec3 pos, glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3)

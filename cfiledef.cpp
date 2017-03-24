@@ -212,3 +212,39 @@ string CFileDef::getObjectKey(int ind)
 	return NULL;
 }
 
+/*
+ * Get the number of total objects that share the same key
+ */
+int CFileDef::getCount(const string &_key)
+{
+	int count = 0;
+
+	for (int i = 0; i < m_numkeys; i++)
+	{
+		if (!m_keys[i].key.compare(_key))
+		{
+			count++;
+		}
+	}
+
+	return count;
+}
+
+string* CFileDef::getObjectValuesIndex(const string &_key, int index)
+{
+	string cad[100];
+	int ind = 0;
+
+	for (int i = 0; i < m_numkeys; i++)
+	{
+		if (!m_keys[i].key.compare(_key))
+		{
+			if (ind == index)
+				return m_keys[i].values;
+			ind++;
+		}
+	}
+
+	return NULL;
+}
+

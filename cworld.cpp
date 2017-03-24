@@ -58,8 +58,15 @@ CWorld::CWorld(string sz_file)
 	//Create the main terrain
 	getGameObjectManager().CreateGameObject(filedef->getObjectValues("TERRAIN")[0], OBJECT_TYPE::TERRAIN, OBJECT_HIERARCHY_LEVEL::LEVEL_0, 0, 0x0, m_pCamara, this, 0, 0, 0);
 
-	getGameObjectManager().CreateGameObject("objetos\\Array House Example_obj.obj", OBJECT_TYPE::BLENDER, OBJECT_HIERARCHY_LEVEL::LEVEL_0, 0, 0x0, m_pCamara, this, 0, 0, 0);
-	getGameObjectManager().CreateGameObject(filedef->getObjectValues("MD2")[1], OBJECT_TYPE::MD2, OBJECT_HIERARCHY_LEVEL::LEVEL_1, 0, 0x0, m_pCamara, this, 200, 100, 200);
+	for (int i=0;i<filedef->getCount("MESH");i++)
+	{
+		getGameObjectManager().CreateGameObject(filedef->getObjectValuesIndex("MESH", i)[1], OBJECT_TYPE::BLENDER, OBJECT_HIERARCHY_LEVEL::LEVEL_1, 0, 0x0, m_pCamara, this, (GLfloat)std::stof(filedef->getObjectValuesIndex("MESH", i)[2]), (GLfloat)std::stof(filedef->getObjectValuesIndex("MESH", i)[3]), (GLfloat)std::stof(filedef->getObjectValuesIndex("MESH", i)[4]));
+	}
+
+	for (int i=0;i<filedef->getCount("MD2");i++)
+	{
+		getGameObjectManager().CreateGameObject(filedef->getObjectValuesIndex("MD2", i)[1], OBJECT_TYPE::MD2, OBJECT_HIERARCHY_LEVEL::LEVEL_1, 0, 0x0, m_pCamara, this, (GLfloat)std::stof(filedef->getObjectValuesIndex("MD2", i)[2]), (GLfloat)std::stof(filedef->getObjectValuesIndex("MD2", i)[3]), (GLfloat)std::stof(filedef->getObjectValuesIndex("MD2", i)[4]));
+	}
 }
 
 void CWorld::Animate(double dt)

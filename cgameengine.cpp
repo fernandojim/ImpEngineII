@@ -5,6 +5,8 @@
 
 using namespace GameObjectManager;
 
+float angle = 0.0;
+
 void CGameEngine::Clear()
 {
 	m_gameTimer = NULL;
@@ -97,7 +99,7 @@ void CGameEngine::OnKeyDown(SDL_Keycode key)
 
 	if (key == SDLK_t)
 	{
-		::getGameObjectManager().m_GameObjectsMD2.at(0).m_velocity = glm::vec3(16.0, 16.0, 16.0);
+		::getGameObjectManager().m_GameObjectsMD2.at(0).m_speed = 16.0;
 	}
 
 	if (key == SDLK_g)
@@ -107,12 +109,12 @@ void CGameEngine::OnKeyDown(SDL_Keycode key)
 
 	if (key == SDLK_f)
 	{
-		::getGameObjectManager().m_GameObjectsMD2.at(0).m_angle += 0.1;
+		::getGameObjectManager().m_GameObjectsMD2.at(0).m_angle += 0.02;
 	}
 
 	if (key == SDLK_h)
 	{
-		::getGameObjectManager().m_GameObjectsMD2.at(0).m_angle -= 0.1;
+		::getGameObjectManager().m_GameObjectsMD2.at(0).m_angle -= 0.02;
 	}
 
 	// Tecla ESC

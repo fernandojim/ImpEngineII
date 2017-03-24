@@ -8,6 +8,7 @@
 #include "glm\mat4x4.hpp"
 #include "glm\vec3.hpp"
 #include "glm\vec2.hpp"
+#include "glm\gtc\quaternion.hpp"
 #include "cvao.h"
 #include "nvertex.h"
 
@@ -98,8 +99,13 @@ public:
 	glm::vec3 m_rotateVector;
 	glm::vec3 m_scale;
 	glm::vec3 m_facing;
-
+	GLfloat   m_speed;
 	float     m_angle;
+
+	/* Rotation quaterions */
+	glm::vec3 m_angles;
+	glm::quat m_qrot;
+	glm::quat m_qrotTo;
 
 protected:
 	GLuint getObjectId();

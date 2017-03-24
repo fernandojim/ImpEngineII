@@ -13,6 +13,8 @@
 #include <iostream>
 #include <vector>
 
+#include "glm\gtc\quaternion.hpp"
+#include "glm\gtx\euler_angles.hpp"
 #include "cterrain.h"
 #include "cmesh.h"
 #include "cmd2model.h"

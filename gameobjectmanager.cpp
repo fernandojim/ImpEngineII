@@ -109,7 +109,7 @@ void CGameObjectManager::UpdateGameObjects()
 		//Local transformation
 		*mesh->m_LocalTransformation = glm::mat4(1.0);
 		*mesh->m_LocalTransformation = glm::translate(*mesh->m_LocalTransformation, mesh->m_position);
-		*mesh->m_LocalTransformation = glm::rotate(*mesh->m_LocalTransformation, mesh->m_angle, mesh->m_rotateVector);
+		*mesh->m_LocalTransformation *= glm::toMat4(mesh->m_qrotTo);
 		*mesh->m_LocalTransformation = glm::scale(*mesh->m_LocalTransformation, mesh->m_scale);
 
 		//World transformation
@@ -122,13 +122,27 @@ void CGameObjectManager::UpdateGameObjects()
 	{
 		CMd2model *md2 = &i;
 
+		//Update quaternion rotation
+		md2->m_angles = glm::vec3(0.0, md2->m_angle , 0.0);
+		md2->m_qrot = glm::quat(md2->m_angles);
+
+		md2->m_facing.x = glm::sin(md2->m_angle + glm::radians(90.0));
+		md2->m_facing.z = glm::cos(md2->m_angle + glm::radians(90.0));
+		glm::normalize(md2->m_facing);
+
+		md2->m_velocity.x = md2->m_facing.x * md2->m_speed;
+		md2->m_velocity.z = md2->m_facing.z * md2->m_speed;
+
+		//Colocates the md2 model object in the terrain level
+		md2->m_position.y = m_GameObjectTerrain[0].GetAltura(md2->m_position.x, md2->m_position.z);
+
 		//Local transformation
 		*md2->m_LocalTransformation = glm::mat4(1.0); //Initialize local transformations
 		*md2->m_LocalTransformation = glm::translate(*md2->m_LocalTransformation, md2->m_position);
-		*md2->m_LocalTransformation = glm::rotate(*md2->m_LocalTransformation, md2->m_angle, md2->m_rotateVector);
+		*md2->m_LocalTransformation *= glm::toMat4(md2->m_qrot);
 		*md2->m_LocalTransformation = glm::scale(*md2->m_LocalTransformation, md2->m_scale);
 
-		//World transformation
+		//World transformation (terrain)
 		*md2->m_WorldTransformation = *m_GameObjectTerrain[0].m_WorldTransformation;
 		*md2->m_LocalTransformation = *md2->m_WorldTransformation * (*md2->m_LocalTransformation);
 		*md2->m_WorldTransformation = *md2->m_LocalTransformation;
@@ -148,23 +162,17 @@ void CGameObjectManager::AnimateGameObjects(double dt)
 
 		//Colocates the mesh object in the terrain level
 		mesh->m_position.y = m_GameObjectTerrain[0].GetAltura(mesh->m_position.x, mesh->m_position.z);
+
+		glm::vec3 norm = m_GameObjectTerrain[0].getNormalAtPos(mesh->m_position);
+		mesh->m_angles = glm::vec3(norm.x, norm.y, norm.z);
+		mesh->m_qrot = glm::quat(mesh->m_angles);
+
 	}
 
 	//Animate md2 models
 	for ( auto &i : m_GameObjectsMD2 )
 	{
 		CMd2model *md2 = &i;
-
-		md2->WalkTo(glm::vec3(0.0, 0.0, 0.0));
-
-		//Update position
-		md2->m_position.x += md2->m_velocity.x * dt * glm::sin(md2->m_angle + glm::radians(90.0));
-		md2->m_position.z += md2->m_velocity.z * dt * glm::cos(md2->m_angle + glm::radians(90.0));
-		md2->m_facing.x = md2->m_facing.x * glm::sin(md2->m_angle + glm::radians(90.0));
-		md2->m_facing.z = md2->m_facing.z * glm::cos(md2->m_angle + glm::radians(90.0));
-
-		//Colocates the md2 model object in the terrain level
-		md2->m_position.y = m_GameObjectTerrain[0].GetAltura(md2->m_position.x, md2->m_position.z);
 
 		//Update the md2 model animation by frames and deltaTime
 		md2->UpdateAnimation(dt);

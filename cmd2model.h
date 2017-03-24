@@ -23,6 +23,7 @@
 #include "glm\gtc\type_ptr.hpp"
 #include "glm\gtc\matrix_transform.hpp" //Header for glm::perspective, etc...
 #include "glm\gtx\vector_angle.hpp"
+#include "glm\gtc\constants.hpp"
 #include "cshader.h"
 #include "cmaterial.h"
 #include "cworld.h"
@@ -171,6 +172,8 @@ public:
 
 	md2_state_t m_currState;
 
+	bool m_walkingTo;
+
 public:
 	bool loadMD2Model(const string s_filename);
 
@@ -185,7 +188,7 @@ public:
 	void setActiveFrame(int f);
 	int getActiveFrame();
 
-	void WalkTo(glm::vec3 position);
+	void WalkTo(glm::vec2 newPosition);
 
 	CMd2model(const string s_filename);
 	virtual ~CMd2model();
