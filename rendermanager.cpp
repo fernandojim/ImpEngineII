@@ -134,6 +134,11 @@ void CRenderManager::Render(std::vector < CTerrain > & terrains)
 			terrain_shader->setUniformShader1f("altmax", terr->m_fAlturaMax);
 
 			//
+			//Camera position
+			//
+			terrain_shader->setUniformShader3fv("camera_pos", 1, glm::value_ptr(terr->m_camera->position));
+
+			//
 			//Lights
 			//
 			terrain_shader->setUniformShader3fv("luz1.lightPosition", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.lightPosition));

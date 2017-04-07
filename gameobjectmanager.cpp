@@ -166,7 +166,6 @@ void CGameObjectManager::AnimateGameObjects(double dt)
 		glm::vec3 norm = m_GameObjectTerrain[0].getNormalAtPos(mesh->m_position);
 		mesh->m_angles = glm::vec3(norm.x, norm.y, norm.z);
 		mesh->m_qrot = glm::quat(mesh->m_angles);
-
 	}
 
 	//Animate md2 models
