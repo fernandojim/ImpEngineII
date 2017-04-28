@@ -147,7 +147,7 @@ void CMesh::loadMesh()
 				}
 				else if (!line.compare(0, SZ_F, "f "))  //Face information
 				{
-					faces.push_back(getFaceInfo(line));
+ 					faces.push_back(getFaceInfo(line));
 				}
 				else if (!line.compare(0, SZ_USEMTL, "usemtl")) //Texture information
 				{
@@ -169,9 +169,10 @@ void CMesh::loadMesh()
 					}
 				}
 			}
-		}
+		} //End of while loop
 
 		/* Creates the buffers */
+
 		//Buffer for vertexs
 		for (GLuint i = 0; i < faces.size(); i++)
 		{
@@ -181,15 +182,38 @@ void CMesh::loadMesh()
 				m_Index.push_back(ind);
 				ind++;
 			}
+
+			//If there is a fourth vertex in the face info, it is created a new triangle face
+			if (faces.at(i).nverts == 4)
+			{
+				m_Vertex.push_back(vertex.at(faces.at(i).vertex[2] - 1));
+				m_Index.push_back(ind);
+
+				ind++;
+
+				m_Vertex.push_back(vertex.at(faces.at(i).vertex[3] - 1));
+				m_Index.push_back(ind);
+
+				ind++;
+
+				m_Vertex.push_back(vertex.at(faces.at(i).vertex[0] - 1));
+				m_Index.push_back(ind);
+
+				ind++;
+			}
 		}
 
+		glm::vec2 aux;
 		//Buffer for texels (if exists)
 		if (texel.size() > 0)
 		{
 			for (GLuint i = 0; i < faces.size(); i++)
 			{
-				for (GLuint j = 0; j < 3; j++)
+				for (GLuint j = 0; j < faces.at(i).nverts; j++)
+				{
+					aux = texel.at(faces.at(i).texel[j] - 1);
 					m_Texel.push_back(texel.at(faces.at(i).texel[j] - 1));
+				}
 			}
 		}
 
@@ -198,7 +222,7 @@ void CMesh::loadMesh()
 		{
 			for (GLuint i = 0; i < faces.size(); i++)
 			{
-				for (GLuint j = 0; j < 3; j++)
+				for (GLuint j = 0; j < faces.at(i).nverts; j++)
 					m_Normal.push_back(normal.at(faces.at(i).normal[j] - 1));
 			}
 		}
@@ -240,22 +264,29 @@ glm::vec2 CMesh::getVec2Info(std::string cad)
 
 /*
 	Get a face info from a cad like:
-	"f 1/1/1 2/2/2 3/3/3" -> vertex/texel/normal
-	or "f 1//1 2//2 3//3" -> vertex/normal
-	or "f 1/2 3/4 5/6 or  -> vertex texel
-	or "f 1 2 3" -> vertex
+	"f 1/1/1 2/2/2 3/3/3 (4/4/4)" -> vertex/texel/normal
+	or "f 1//1 2//2 3//3 (4//4)" -> vertex/normal
+	or "f 1/1 2/2 3/3 (4/4)  -> vertex/texel
+	or "f 1 2 3 (4)" -> vertex
 */
 face CMesh::getFaceInfo(std::string cad)
 {
 	face f;
-	string _cad[4];
+	string _cad[5];
 	string token;
 	int j;
 
-	/* Get the three vertex info */
-	std::stringstream(cad) >> _cad[0] >> _cad[1] >> _cad[2] >> _cad[3];
+	f = {0};
 
-	for (int i = 0; i <= 2; i++)
+	/* Get the three vertex info */
+	std::stringstream(cad) >> _cad[0] >> _cad[1] >> _cad[2] >> _cad[3] >> _cad[4];
+
+	if (_cad[4].length() > 0)
+		f.nverts = 4;
+	else
+		f.nverts = 3;
+
+	for (GLuint i = 0; i <= f.nverts - 1; i++)
 	{
 		j = 0;
 		std::istringstream ss(_cad[i + 1]);

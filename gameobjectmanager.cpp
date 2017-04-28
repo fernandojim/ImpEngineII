@@ -26,6 +26,7 @@ CGameObjectManager& GameObjectManager::getGameObjectManager()
 */
 CGameObjectManager::CGameObjectManager()
 {
+	m_fbo = NULL;
 	m_posGameObject = 0;
 }
 

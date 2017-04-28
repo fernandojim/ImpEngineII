@@ -140,6 +140,7 @@ CTerrain::CTerrain(const string file) : CGameObject()
 		m_GrassTextureId = ::getTextureManager().loadTexture(m_GrassTexture);
 		m_DirtTextureId = ::getTextureManager().loadTexture(m_DirtTexture);
 		m_SnowTextureId = ::getTextureManager().loadTexture(m_SnowTexture);
+		//m_GrassTextureId = 2;
 
 		//The terrain has no parents.
 		m_pParent = NULL;

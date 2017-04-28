@@ -2,13 +2,6 @@
 
 #include "cfont.h"
 
-#include <math.h>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp" //Header for glm::perspective, etc...
-#include "glm/gtc/type_ptr.hpp"
-
-#include "texturemanager.h"
-
 using namespace TextureManager;
 
 CFont::CFont(const char *vs, const char *fs)
@@ -39,6 +32,11 @@ CFont::CFont(const char *vs, const char *fs)
 
 	m_text = " ";
 	
+	/* Crea las matrices */
+	//La proyección será ortográfica por tratarse de un objeto fijo e inmovil.
+	m_view = glm::lookAt(glm::vec3(0.0, 0.0, 90.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	m_projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 100.0f, -100.0f);
+
 	//Crea los shader asociados a este objeto
 	m_pShader = new CShader("shaders\\fonts.vertex", "shaders\\fonts.fragment");
 
@@ -149,24 +147,21 @@ void CFont::Render(string text)
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 
 		//Crea la matrix Model-View-Projection
-		//La proyección será ortográfica por tratarse de un objeto fijo e inmovil.
-		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(0.0 + (ANCHO_CELDA * despx) + DESPLAZAMIENTO_X, 0.0 - despy, 0.0));
-		glm::mat4 view = glm::lookAt(glm::vec3(0.0, 0.0, 90.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-		glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 100.0f, -100.0f);
-		glm::mat4 mvp = projection * view * model;
+		m_model = glm::translate(glm::mat4(1.0), glm::vec3(0.0 + (ANCHO_CELDA * despx) + DESPLAZAMIENTO_X, 0.0 - despy, 0.0));
+		m_mvp = m_projection * m_view * m_model;
 
 		//Get the texture id
+		GLuint val = glGetUniformLocation(m_pShader->m_uiProgram, "texturaFonts");
+		glUniform1i(val, m_uiTextura);
 		glActiveTexture(GL_TEXTURE0 + m_uiTextura);
 		glBindTexture(GL_TEXTURE_2D, m_uiTextura);
-		glUniform1i(glGetUniformLocation(m_pShader->m_uiProgram, "texturaFonts"), m_uiTextura);
 
 		//Matrix de transformación
 		base = glGetUniformLocation(m_pShader->m_uiProgram, "mvp");
-		glUniformMatrix4fv(base, 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniformMatrix4fv(base, 1, GL_FALSE, glm::value_ptr(m_mvp));
 
-		//glBindVertexArray(m_pVAO->m_vaoHandle);
 		glBindVertexArray(m_pVAO->m_vaoHandle);
-		glDrawElements(GL_TRIANGLE_STRIP, N_VERTEX, GL_UNSIGNED_INT, &m_Index[0]);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
 
 		despx++;

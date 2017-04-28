@@ -38,7 +38,7 @@ CMd2model::CMd2model(const string s_filename)  : CGameObject()
 
 	setState(md2_state_t::STAND1);
 
-	//Geometry initializations
+	//Physics initializations
 	m_angle = glm::radians(0.0);
 	m_speed = 0.0;
 	m_angles = glm::vec3(0.0, 0.0, 0.0);

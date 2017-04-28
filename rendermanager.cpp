@@ -95,6 +95,13 @@ CShader* CRenderManager::getShaderByName(const string sName)
 
 void CRenderManager::Render()
 {
+	::getGameObjectManager().m_fbo->BindFBO();
+	getRenderManager().Render(getGameObjectManager().m_GameObjectTerrain);
+	getRenderManager().Render(getGameObjectManager().m_GameObjectsMesh);
+	getRenderManager().Render(getGameObjectManager().m_GameObjectsMD2);
+	::getGameObjectManager().m_fbo->UnbindFBO();
+	glViewport(0,0,800,600);
+
 	getRenderManager().Render(getGameObjectManager().m_GameObjectTerrain);
 	getRenderManager().Render(getGameObjectManager().m_GameObjectsMesh);
 	getRenderManager().Render(getGameObjectManager().m_GameObjectsMD2);
@@ -186,8 +193,9 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 		     //Textures
 		     //
 		     mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", mesh->m_Material->m_iMap_kd_texture);
+		     //mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", 4);
 
-			 //
+		     //
 			 //Lights
 			 //
 			 mesh_shader->setUniformShader3fv("luz1.lightPosition", 1, glm::value_ptr(mesh->m_world->m_Lights[0].m_light.lightPosition));

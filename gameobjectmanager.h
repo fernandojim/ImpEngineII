@@ -18,12 +18,14 @@
 #include "cterrain.h"
 #include "cmesh.h"
 #include "cmd2model.h"
+#include "cfbo.h"
 
 using namespace std;
 
 class CTerrain;
 class CMesh;
 class CMd2model;
+class CFbo;
 
 namespace GameObjectManager
 {
@@ -42,6 +44,8 @@ namespace GameObjectManager
 
 			// List of MD2 models
 			std::vector < CMd2model > m_GameObjectsMD2;
+
+			CFbo *m_fbo;
 
 		public:
 			CGameObjectManager();

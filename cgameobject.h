@@ -26,9 +26,10 @@ enum OBJECT_HIERARCHY_LEVEL {LEVEL_0 = 0, LEVEL_1, LEVEL_2, LEVEL_3};
 
 struct face
 {
-	GLuint vertex[3];
-	GLuint texel[3];
-	GLuint normal[3];
+	GLuint nverts;
+	GLuint vertex[4];
+	GLuint texel[4];
+	GLuint normal[4];
 };
 
 /*
@@ -92,7 +93,7 @@ public:
 	void BindBufferAttrib(GLuint attrib_id, GLuint buffer_id, GLuint elements);
 
 public:
-	/* Geometry */
+	/* Physics */
 	glm::vec3 m_acceleration;
 	glm::vec3 m_velocity;
 	glm::vec3 m_position;

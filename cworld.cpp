@@ -55,6 +55,9 @@ CWorld::CWorld(string sz_file)
 	//Create the manager of renderers
 	getRenderManager().loadShadersFromFile(filedef->getObjectValues("SHADERS")[0]);
 
+	//Create Frame Buffer Object
+	getGameObjectManager().m_fbo = new CFbo(512, 512);
+
 	//Create the main terrain
 	getGameObjectManager().CreateGameObject(filedef->getObjectValues("TERRAIN")[0], OBJECT_TYPE::TERRAIN, OBJECT_HIERARCHY_LEVEL::LEVEL_0, 0, 0x0, m_pCamara, this, 0, 0, 0);
 

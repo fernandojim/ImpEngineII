@@ -39,7 +39,7 @@ public:
 	bool addTexture(GLuint id);
 
 public:
-	//Used textures id
+	//Used textures ids
 	GLuint      m_SandTextureId;
 	GLuint      m_GrassTextureId;
 	GLuint      m_DirtTextureId;

@@ -43,6 +43,7 @@ namespace TextureManager
 			~CTextureManager();
 			
 			GLuint loadTexture(const string sTexturePath);
+			GLuint depthBufferTexture(GLuint &iFrameBuffer);
 			CTexture* getTextureByID(GLuint id);
 			bool deleteTexture(GLuint id);
 	};

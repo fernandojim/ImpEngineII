@@ -7,6 +7,13 @@
 #include "glm\vec2.hpp"
 #include "nvertex.h"
 
+#include <math.h>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp" //Header for glm::perspective, etc...
+#include "glm/gtc/type_ptr.hpp"
+
+#include "texturemanager.h"
+
 #define TEXT_VS      "shaders\\text.vertex"			//Vertex shader file
 #define TEXT_FS      "shaders\\text.fragment"       //Fragment shader file
 
@@ -28,6 +35,12 @@ private:
 	Vertex2* m_Vertex;
 	Vertex2* m_Texel;
 	GLuint*  m_Index;
+
+	//Matrix
+	glm::mat4 m_projection;
+	glm::mat4 m_model;
+	glm::mat4 m_view;
+	glm::mat4 m_mvp;
 
 	//Shader para el renderizado
 	CShader   *m_pShader;
