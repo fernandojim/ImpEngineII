@@ -30,8 +30,12 @@
 using namespace MaterialManager;
 using namespace GameObjectManager;
 
+ofstream salida2;
+
 CMesh::CMesh(const string name) : CGameObject()
 {
+	salida2.open("salida.txt", std::ifstream::binary|std::ifstream::trunc);
+
 	load(name);
 }
 
@@ -171,14 +175,21 @@ void CMesh::loadMesh()
 			}
 		} //End of while loop
 
-		/* Creates the buffers */
+		/* Create the buffers */
 
-		//Buffer for vertexs
+		//Buffer for vertexs/texels (if exists)
 		for (GLuint i = 0; i < faces.size(); i++)
 		{
 			for (GLuint j = 0; j < 3; j++)
 			{
 				m_Vertex.push_back(vertex.at(faces.at(i).vertex[j] - 1));
+
+				if (texel.size() > 0)
+					m_Texel.push_back(texel.at(faces.at(i).texel[j] - 1));
+
+				if (normal.size() > 0)
+					m_Normal.push_back(normal.at(faces.at(i).normal[j] - 1));
+
 				m_Index.push_back(ind);
 				ind++;
 			}
@@ -187,48 +198,53 @@ void CMesh::loadMesh()
 			if (faces.at(i).nverts == 4)
 			{
 				m_Vertex.push_back(vertex.at(faces.at(i).vertex[2] - 1));
+
+				if (texel.size() > 0)
+					m_Texel.push_back(texel.at(faces.at(i).texel[2] - 1));
+
+				if (normal.size() > 0)
+					m_Normal.push_back(normal.at(faces.at(i).normal[2] - 1));
+
 				m_Index.push_back(ind);
 
 				ind++;
 
 				m_Vertex.push_back(vertex.at(faces.at(i).vertex[3] - 1));
+
+				if (texel.size() > 0)
+					m_Texel.push_back(texel.at(faces.at(i).texel[3] - 1));
+
+				if (normal.size() > 0)
+					m_Normal.push_back(normal.at(faces.at(i).normal[3] - 1));
+
 				m_Index.push_back(ind);
 
 				ind++;
 
 				m_Vertex.push_back(vertex.at(faces.at(i).vertex[0] - 1));
+
+				if (texel.size() > 0)
+					m_Texel.push_back(texel.at(faces.at(i).texel[0] - 1));
+
+				if (normal.size() > 0)
+					m_Normal.push_back(normal.at(faces.at(i).normal[0] - 1));
+
 				m_Index.push_back(ind);
 
 				ind++;
 			}
 		}
 
-		glm::vec2 aux;
-		//Buffer for texels (if exists)
-		if (texel.size() > 0)
-		{
-			for (GLuint i = 0; i < faces.size(); i++)
-			{
-				for (GLuint j = 0; j < faces.at(i).nverts; j++)
-				{
-					aux = texel.at(faces.at(i).texel[j] - 1);
-					m_Texel.push_back(texel.at(faces.at(i).texel[j] - 1));
-				}
-			}
-		}
-
-		//Buffer for normals (if exists)
-		if (normal.size() > 0)
-		{
-			for (GLuint i = 0; i < faces.size(); i++)
-			{
-				for (GLuint j = 0; j < faces.at(i).nverts; j++)
-					m_Normal.push_back(normal.at(faces.at(i).normal[j] - 1));
-			}
-		}
-
 		m_File->m_Filedef.close();
 	}
+
+	for (int x = 0;x<36;x++)
+	{
+		salida2 << "m_Vertex=(" << m_Vertex.at(x).x << "," << m_Vertex.at(x).y << "," << m_Vertex.at(x).z << ") m_Texel=(";
+		salida2 << m_Texel.at(x).x << "," << m_Texel.at(x).y << ")\n";
+	}
+
+	salida2.close();
 }
 
 /*

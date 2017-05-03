@@ -74,6 +74,8 @@ void CFbo::Create2()
 
 void CFbo::Create()
 {
+	GLenum err = 0;
+
 	//Generate and bind the frame buffer
 	glGenFramebuffers(1, &m_uiFboHandler);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_uiFboHandler);
@@ -81,22 +83,17 @@ void CFbo::Create()
 	//Generate and bind the texture
 	glGenTextures(1, &m_uiTextureHandler);
 	glActiveTexture(GL_TEXTURE0 + m_uiTextureHandler);
-	glBindTexture(GL_TEXTURE, m_uiTextureHandler);
+	glBindTexture(GL_TEXTURE_2D, m_uiTextureHandler);
 #ifdef _OPENGL44_
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB, m_width, m_height);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA, m_width, m_height);
 #else
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 #endif
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	//glGenRenderbuffers(1, &m_uiColorHandler);
 
 	//Bind the texture to Frame Buffer Object
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_uiTextureHandler, 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_uiTextureHandler, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_uiTextureHandler, 0);
 
 	//Create the depth buffer
 	glGenRenderbuffers(1, &m_uiDepthHandler);
@@ -108,29 +105,18 @@ void CFbo::Create()
 	GLenum drawBufs[] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, drawBufs);
 
-	//Unbind the buffers and revert to default
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	// Always check that our framebuffer is ok
 	m_buffererror = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-	//Create one pixel white texture
-	/*GLubyte whiteTex[] = { 255, 255, 255, 255 };
-	glGenTextures(1, &m_uiWhiteTexture);
-	glActiveTexture(GL_TEXTURE0 + m_uiWhiteTexture);
-	glBindTexture(GL_TEXTURE_2D, m_uiWhiteTexture);
-#ifdef _OPENGL44_
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA, 1, 1);
-#else
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
-#endif
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, whiteTex);*/
+	//Unbind the buffers and revert to default
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void CFbo::BindFBO()
 {
 	//Bind the Frame Buffer Object to its usage
 	glBindFramebuffer(GL_FRAMEBUFFER, m_uiFboHandler);
+	// adjust viewport and projection matrices to texture dimensions
 	glViewport(0, 0, m_width, m_height);
 }
 
