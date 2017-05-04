@@ -1,0 +1,15 @@
+# Parámetros de engine y del mundo
+# FULLSCREEN N o Y
+# VSYNC N o Y
+# WINDOW_RES XXX YYY BB
+#
+#
+
+-engine
+{
+	FULLSCREEN N
+	VSYNC N
+	WINDOW_RES 800 600 24
+	WORLD objetos\world.dat
+}
+	

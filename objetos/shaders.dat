@@ -1,0 +1,9 @@
+# Biblioteca de shaders
+# El formato es [nombre] de donde se deduce nombre.vertex y nombre.fragment
+
+-shaders
+{
+	terrain
+	mesh1
+	md2model
+}
