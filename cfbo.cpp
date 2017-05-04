@@ -60,13 +60,13 @@ void CFbo::Create()
 	glGenRenderbuffers(1, &rboDepthStencil);
 	glBindRenderbuffer(GL_RENDERBUFFER, rboDepthStencil);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 512);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepthStencil);
+	glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepthStencil);
 
 	//Create the depth buffer
 	glGenRenderbuffers(1, &m_uiDepthHandler);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_uiDepthHandler);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-	glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_uiDepthHandler);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_uiDepthHandler);
 
 	//Set the target for the fragment shader output
 	GLenum drawBufs[] = { GL_COLOR_ATTACHMENT0 };
@@ -89,7 +89,7 @@ void CFbo::BindFBO()
 
 	//Clean the color and depth buffers
 	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void CFbo::UnbindFBO()

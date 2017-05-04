@@ -30,12 +30,8 @@
 using namespace MaterialManager;
 using namespace GameObjectManager;
 
-ofstream salida2;
-
 CMesh::CMesh(const string name) : CGameObject()
 {
-	salida2.open("salida.txt", std::ifstream::binary|std::ifstream::trunc);
-
 	load(name);
 }
 
@@ -237,14 +233,6 @@ void CMesh::loadMesh()
 
 		m_File->m_Filedef.close();
 	}
-
-	for (int x = 0;x<36;x++)
-	{
-		salida2 << "m_Vertex=(" << m_Vertex.at(x).x << "," << m_Vertex.at(x).y << "," << m_Vertex.at(x).z << ") m_Texel=(";
-		salida2 << m_Texel.at(x).x << "," << m_Texel.at(x).y << ")\n";
-	}
-
-	salida2.close();
 }
 
 /*

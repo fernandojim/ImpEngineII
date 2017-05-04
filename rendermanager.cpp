@@ -197,7 +197,6 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 		     //mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", mesh->m_Material->m_iMap_kd_texture);
 		     mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", ::getGameObjectManager().m_fbo->m_uiTextureHandler);
 
-
 		     //
 			 //Lights
 			 //
