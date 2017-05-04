@@ -46,7 +46,6 @@ public:
 	virtual ~CFbo();
 
 	void Create();
-	void Create2();
 	void BindFBO();
 	void UnbindFBO();
 

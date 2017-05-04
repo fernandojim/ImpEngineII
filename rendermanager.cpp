@@ -102,9 +102,11 @@ void CRenderManager::Render()
 	::getGameObjectManager().m_fbo->UnbindFBO();
 	glViewport(0,0,800,600);
 
-	//getRenderManager().Render(getGameObjectManager().m_GameObjectTerrain);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	getRenderManager().Render(getGameObjectManager().m_GameObjectTerrain);
 	getRenderManager().Render(getGameObjectManager().m_GameObjectsMesh);
-	//getRenderManager().Render(getGameObjectManager().m_GameObjectsMD2);
+	getRenderManager().Render(getGameObjectManager().m_GameObjectsMD2);
 }
 
 void CRenderManager::Render(std::vector < CTerrain > & terrains)
@@ -194,6 +196,7 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 		     //
 		     //mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", mesh->m_Material->m_iMap_kd_texture);
 		     mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", ::getGameObjectManager().m_fbo->m_uiTextureHandler);
+
 
 		     //
 			 //Lights
