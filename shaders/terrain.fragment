@@ -1,6 +1,6 @@
 #version 330 core
 
-out vec4 vFragColor;
+layout (location = 0) out vec4 vFragColor;
 
 struct light
 {
@@ -15,6 +15,7 @@ struct light
 uniform float altmax;
 uniform float tilingfactor;
 uniform light luz1;
+uniform vec3 camera_pos;
 
 in vec2 varyingTexCoord;
 in float altura;
@@ -38,7 +39,7 @@ void main()
 	vec4 colorgrass = texture(texturagrass, varyingTexCoord * tilingFactorGrass);
 	vec4 colordirt = texture(texturadirt, varyingTexCoord * tilingFactorDirt);
 	vec4 colorsnow = texture(texturasnow, varyingTexCoord * tilingFactorSnow);
-			
+	
 	if ( altura >= 0.0 && altura <= 100.0 )
 		vFragColor = colorgrass;
 	else if ( altura <= 250.0 )
@@ -56,5 +57,5 @@ void main()
 	vec3 r = reflect( -s, n );
 	vec3 h = normalize( v + s );
 	
-	vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);	
+	vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);
 }
