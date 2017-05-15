@@ -29,6 +29,8 @@ CRenderManager& RenderManager::getRenderManager()
 CRenderManager::CRenderManager()
 {
 	m_uiShaders = 0;
+
+	m_Shaders.clear();
 }
 
 CRenderManager::~CRenderManager()
@@ -111,10 +113,13 @@ void CRenderManager::Render()
 
 void CRenderManager::Render(std::vector < CTerrain > & terrains)
 {
-	//Traverses the shader list and 'execute' everyone for its associated GameObjects
-	CShader *terrain_shader = getShaderByName("terrain");
 	GLint offset;
 	GLint size;
+
+	//
+	//Load the shader for terrain
+	//
+	CShader *terrain_shader = getShaderByName("terrain");
 
 	//
 	//Draw terrain object
@@ -126,14 +131,11 @@ void CRenderManager::Render(std::vector < CTerrain > & terrains)
 		     CTerrain *terr = &i;
 
 		    //
-			//Textures
-			//
-			terrain_shader->setUniformShaderTexture2D("texturasand", terr->m_SandTextureId);
-			terrain_shader->setUniformShaderTexture2D("texturagrass", terr->m_GrassTextureId);
-			terrain_shader->setUniformShaderTexture2D("texturadirt", terr->m_DirtTextureId);
-			terrain_shader->setUniformShaderTexture2D("texturasnow", terr->m_SnowTextureId);
+		    //frameBuffer texture
+		    //
+		    terrain_shader->setUniformShaderTexture2D("texturafrmb", ::getGameObjectManager().m_fbo->m_uiTextureHandler);
 
-			//
+		    //
 			//Tiling texture factors, etc.
 			//
 			terrain_shader->setUniformShader1f("tilingFactorSand", terr->m_tilingFactorSand);
@@ -152,10 +154,37 @@ void CRenderManager::Render(std::vector < CTerrain > & terrains)
 			//
 			terrain_shader->setUniformShader3fv("luz1.lightPosition", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.lightPosition));
 			terrain_shader->setUniformShader3fv("luz1.lightIntensity", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.lightIntensity));
-			terrain_shader->setUniformShader3fv("luz1.ka", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.ka));
-			terrain_shader->setUniformShader3fv("luz1.kd", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.kd));
-			terrain_shader->setUniformShader3fv("luz1.ks", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.ks));
-			terrain_shader->setUniformShader1f("luz1.shininess", terr->m_world->m_Lights[0].m_light.shininess);
+
+			//
+			//Materials
+			//
+			// sand
+			terrain_shader->setUniformShader1f("material1.shininess", terr->m_MatSand.m_fNs);
+			terrain_shader->setUniformShader3fv("material1.ka", 1, glm::value_ptr(terr->m_MatSand.m_vKa));
+			terrain_shader->setUniformShader3fv("material1.kd", 1, glm::value_ptr(terr->m_MatSand.m_vKd));
+			terrain_shader->setUniformShader3fv("material1.ks", 1, glm::value_ptr(terr->m_MatSand.m_vKs));
+			terrain_shader->setUniformShaderTexture2D("material1.tex_kd", terr->m_MatSand.m_iMap_kd_texture);
+
+			// grass
+			terrain_shader->setUniformShader1f("material2.shininess", terr->m_MatGrass.m_fNs);
+			terrain_shader->setUniformShader3fv("material2.ka", 1, glm::value_ptr(terr->m_MatGrass.m_vKa));
+			terrain_shader->setUniformShader3fv("material2.kd", 1, glm::value_ptr(terr->m_MatGrass.m_vKd));
+			terrain_shader->setUniformShader3fv("material2.ks", 1, glm::value_ptr(terr->m_MatGrass.m_vKs));
+			terrain_shader->setUniformShaderTexture2D("material2.tex_kd", terr->m_MatGrass.m_iMap_kd_texture);
+
+			// dirt
+			terrain_shader->setUniformShader1f("material3.shininess", terr->m_MatDirt.m_fNs);
+			terrain_shader->setUniformShader3fv("material3.ka", 1, glm::value_ptr(terr->m_MatDirt.m_vKa));
+			terrain_shader->setUniformShader3fv("material3.kd", 1, glm::value_ptr(terr->m_MatDirt.m_vKd));
+			terrain_shader->setUniformShader3fv("material3.ks", 1, glm::value_ptr(terr->m_MatDirt.m_vKs));
+			terrain_shader->setUniformShaderTexture2D("material3.tex_kd", terr->m_MatDirt.m_iMap_kd_texture);
+
+			// snow
+			terrain_shader->setUniformShader1f("material4.shininess", terr->m_MatSnow.m_fNs);
+			terrain_shader->setUniformShader3fv("material4.ka", 1, glm::value_ptr(terr->m_MatSnow.m_vKa));
+			terrain_shader->setUniformShader3fv("material4.kd", 1, glm::value_ptr(terr->m_MatSnow.m_vKd));
+			terrain_shader->setUniformShader3fv("material4.ks", 1, glm::value_ptr(terr->m_MatSnow.m_vKs));
+			terrain_shader->setUniformShaderTexture2D("material4.tex_kd", terr->m_MatSnow.m_iMap_kd_texture);
 
 			//
 			//Transformation Matrices
@@ -163,6 +192,7 @@ void CRenderManager::Render(std::vector < CTerrain > & terrains)
 			terrain_shader->setUniformShaderMatrix3fv("m3normal", 1, GL_FALSE, glm::value_ptr(terr->m_camera->m_M3normal));
 			terrain_shader->setUniformShaderMatrix4fv("m4modelview", 1, GL_FALSE, glm::value_ptr(terr->m_camera->m_M4modelView));
 			terrain_shader->setUniformShaderMatrix4fv("m4mvp", 1, GL_FALSE, glm::value_ptr(*terr->m_WorldTransformation));
+			terrain_shader->setUniformShaderMatrix4fv("m4vpi", 1, GL_FALSE, glm::value_ptr(terr->m_camera->m_M4ViewProjectionInverse));
 
 			//
 			//Render the object terrain
@@ -180,6 +210,9 @@ void CRenderManager::Render(std::vector < CTerrain > & terrains)
 
 void CRenderManager::Render(std::vector < CMesh > & meshes)
 {
+	//
+	//Load the shader for meshes
+	//
 	CShader *mesh_shader = getShaderByName("mesh1");
 
 	//
@@ -194,18 +227,22 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 		     //
 		     //Textures
 		     //
-		     //mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", mesh->m_Material->m_iMap_kd_texture);
-		     mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", ::getGameObjectManager().m_fbo->m_uiTextureHandler);
+		     mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", mesh->m_Material->m_iMap_kd_texture);
+		     //mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", ::getGameObjectManager().m_fbo->m_uiTextureHandler);
 
 		     //
 			 //Lights
 			 //
 			 mesh_shader->setUniformShader3fv("luz1.lightPosition", 1, glm::value_ptr(mesh->m_world->m_Lights[0].m_light.lightPosition));
 			 mesh_shader->setUniformShader3fv("luz1.lightIntensity", 1, glm::value_ptr(mesh->m_world->m_Lights[0].m_light.lightIntensity));
-			 mesh_shader->setUniformShader3fv("luz1.ka", 1, glm::value_ptr(mesh->m_Material->m_vKa));
-			 mesh_shader->setUniformShader3fv("luz1.kd", 1, glm::value_ptr(mesh->m_Material->m_vKd));
-			 mesh_shader->setUniformShader3fv("luz1.ks", 1, glm::value_ptr(mesh->m_Material->m_vKs));
-			 mesh_shader->setUniformShader1f("luz1.shininess", mesh->m_world->m_Lights[0].m_light.shininess);
+
+			 //
+			 //Materials
+			 //
+			 mesh_shader->setUniformShader3fv("material1.ka", 1, glm::value_ptr(mesh->m_Material->m_vKa));
+			 mesh_shader->setUniformShader3fv("material1.kd", 1, glm::value_ptr(mesh->m_Material->m_vKd));
+			 mesh_shader->setUniformShader3fv("material1.ks", 1, glm::value_ptr(mesh->m_Material->m_vKs));
+			 mesh_shader->setUniformShader1f("material1.shininess", mesh->m_Material->m_fNs);
 
 			 //
 			 //Transformation Matrices
@@ -228,8 +265,12 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 
 void CRenderManager::Render(std::vector < CMd2model > & md2)
 {
-	CShader *md2model_shader = getShaderByName("md2model");
 	int nframe = 0;
+
+	//
+	//load the shader for md2 models
+	//
+	CShader *md2model_shader = getShaderByName("md2model");
 
 	//
 	//Draw meshes objects
@@ -254,14 +295,16 @@ void CRenderManager::Render(std::vector < CMd2model > & md2)
 			//
 			//Lights
 			//
-			glm::vec3 k = glm::vec3(1.0, 1.0, 1.0);
-
+			glm::vec3 ka = glm::vec3(1.0, 1.0, 1.0);
+			glm::vec3 kd = glm::vec3(1.0, 1.0, 1.0);
+			glm::vec3 ks = glm::vec3(0.5, 0.5, 0.5);
+			float shininess = 1.0;
 			md2model_shader->setUniformShader3fv("luz1.lightPosition", 1, glm::value_ptr(md2model->m_world->m_Lights[0].m_light.lightPosition));
 			md2model_shader->setUniformShader3fv("luz1.lightIntensity", 1, glm::value_ptr(md2model->m_world->m_Lights[0].m_light.lightIntensity));
-			md2model_shader->setUniformShader3fv("luz1.ka", 1, glm::value_ptr(k));
-			md2model_shader->setUniformShader3fv("luz1.kd", 1, glm::value_ptr(k));
-			md2model_shader->setUniformShader3fv("luz1.ks", 1, glm::value_ptr(k));
-			md2model_shader->setUniformShader1f("luz1.shininess", md2model->m_world->m_Lights[0].m_light.shininess);
+			md2model_shader->setUniformShader3fv("material1.ka", 1, glm::value_ptr(ka));
+			md2model_shader->setUniformShader3fv("material1.kd", 1, glm::value_ptr(kd));
+			md2model_shader->setUniformShader3fv("material1.ks", 1, glm::value_ptr(ks));
+			md2model_shader->setUniformShader1f("material1.shininess", shininess);
 
 			//
 			//Transformation Matrices

@@ -25,6 +25,7 @@ CTexture::CTexture(std::string sFilename)
 
 		if ( image == NULL || ( image != NULL && ( image->h == 0 || image->w == 0 ) ) ) //Error
 		{
+			//MessageBOX("Loading texture error", SDL_GetError());
 			m_ID = -1;
 			m_error = true;
 		}
@@ -81,11 +82,7 @@ void CTexture::bindTexture()
 
 	glGenTextures(1, &m_ID);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
-#ifdef _OPENGL44_
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB, m_lWidth, m_lHeight);
-#else
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_lWidth, m_lHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, m_Pixeldata);
-#endif
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }

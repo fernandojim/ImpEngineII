@@ -41,6 +41,8 @@ CMaterialManager& MaterialManager::getMaterialManager()
 CMaterialManager::CMaterialManager()
 {
 	m_uiMaterials = 0;
+
+	m_Materials.clear();
 }
 
 CMaterialManager::~CMaterialManager()
@@ -63,6 +65,8 @@ CMaterialManager::~CMaterialManager()
 	}
 
 	m_Materials.clear();
+
+	m_uiMaterials = 0;
 }
 
 void CMaterialManager::loadMaterialsFromMTL(const string sMTLName)
@@ -80,10 +84,10 @@ void CMaterialManager::loadMaterialsFromMTL(const string sMTLName)
 	CFileDef *filedef = new CFileDef(sMTLName);
 
 	//Test if this material exists in the library of materials
-	pMaterial = getMaterialByName(sMTLName);
+	//pMaterial = getMaterialByName(sMTLName);
 
 	//Load material
-	if (pMaterial == NULL && filedef->getIsOpen())
+	if (filedef->getIsOpen() && filedef->m_Filedef.good())
 	{
 		while (!filedef->m_Filedef.eof())
 		{
@@ -122,6 +126,10 @@ void CMaterialManager::loadMaterialsFromMTL(const string sMTLName)
 						{
 							/* get line from file and stores into buffer */
 							std::getline(filedef->m_Filedef, line);
+
+							//Test if it is the end of a material
+							if (line.size() == 0 || line.at(0) == '#' || line.at(0) == '\n' || line.at(0) == '\0' || line.at(0) == ' ')
+								break;
 
 							if (!line.compare(0, SZ_NS, "Ns"))
 							{
@@ -210,6 +218,41 @@ CMaterial* CMaterialManager::getMaterialByName(const string sName)
 		return (CMaterial*)iter->second;
 	else
 		return NULL;
+}
+
+GLuint CMaterialManager::getTextureId(TEXTURE_MAP_TYPE texType, const string sName)
+{
+	std::map < string, CMaterial* >::iterator iter;
+
+	//Gets the map of id
+	iter = m_Materials.find(sName);
+
+	if (iter != m_Materials.end())
+	{
+		CMaterial *aux = (CMaterial*)iter->second;
+
+		//Test if the material exists
+		if (aux != NULL)
+		{
+			switch (texType)
+			{
+				case MAP_KA:
+					return aux->m_iMap_ka_texture;
+				break;
+				case MAP_KD:
+					return aux->m_iMap_kd_texture;
+				break;
+				case MAP_KS:
+					return aux->m_iMap_ks_texture;
+				break;
+				default:
+					return 0;
+				break;
+			}
+		}
+	}
+
+	return 0;
 }
 
 

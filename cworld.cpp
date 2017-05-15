@@ -24,42 +24,28 @@ CWorld::CWorld(string sz_file)
 
 		//Crea luces
 		// luz 0
-		light = std::stoi(filedef->getObjectValues("LIGHT")[light]);
+		light = filedef->getIntObjectValues("LIGHT")[light];
 
-		m_Lights[light].m_light.lightPosition.x = std::stof(filedef->getObjectValues("POSITION")[0]);
-		m_Lights[light].m_light.lightPosition.y = std::stof(filedef->getObjectValues("POSITION")[1]);
-		m_Lights[light].m_light.lightPosition.z = std::stof(filedef->getObjectValues("POSITION")[2]);
+		m_Lights[light].m_light.lightPosition.x = filedef->getFloatObjectValues("POSITION")[0];
+		m_Lights[light].m_light.lightPosition.y = filedef->getFloatObjectValues("POSITION")[1];
+		m_Lights[light].m_light.lightPosition.z = filedef->getFloatObjectValues("POSITION")[2];
 
-		m_Lights[light].m_light.lightIntensity.x = std::stof(filedef->getObjectValues("INTENSITY")[0]);
-		m_Lights[light].m_light.lightIntensity.y = std::stof(filedef->getObjectValues("INTENSITY")[1]);
-		m_Lights[light].m_light.lightIntensity.z = std::stof(filedef->getObjectValues("INTENSITY")[2]);
-
-		m_Lights[light].m_light.ka.x = std::stof(filedef->getObjectValues("KA")[0]);
-		m_Lights[light].m_light.ka.y = std::stof(filedef->getObjectValues("KA")[1]);
-		m_Lights[light].m_light.ka.z = std::stof(filedef->getObjectValues("KA")[2]);
-
-		m_Lights[light].m_light.kd.x = std::stof(filedef->getObjectValues("KD")[0]);
-		m_Lights[light].m_light.kd.y = std::stof(filedef->getObjectValues("KD")[1]);
-		m_Lights[light].m_light.kd.z = std::stof(filedef->getObjectValues("KD")[2]);
-
-		m_Lights[light].m_light.ks.x = std::stof(filedef->getObjectValues("KS")[0]);
-		m_Lights[light].m_light.ks.y = std::stof(filedef->getObjectValues("KS")[1]);
-		m_Lights[light].m_light.ks.z = std::stof(filedef->getObjectValues("KS")[2]);
-
-		m_Lights[light].m_light.shininess = std::stof(filedef->getObjectValues("SHININESS")[0]);
+		m_Lights[light].m_light.lightIntensity.x = filedef->getFloatObjectValues("INTENSITY")[0];
+		m_Lights[light].m_light.lightIntensity.y = filedef->getFloatObjectValues("INTENSITY")[1];
+		m_Lights[light].m_light.lightIntensity.z = filedef->getFloatObjectValues("INTENSITY")[2];
 	}
 
 	//Establecemos la cámara de la escena
-	m_pCamara = new CCamera(std::stoi(filedef->getObjectValues("CAM_ASPECT")[0]),  // width
-							std::stoi(filedef->getObjectValues("CAM_ASPECT")[1]),  // height
-							std::stof(filedef->getObjectValues("CAM_ASPECT")[2])); // aspect
-	m_pCamara->position = glm::vec3(std::stoi(filedef->getObjectValues("CAM_POSITION")[0]), 0.0, std::stoi(filedef->getObjectValues("CAM_POSITION")[1]));
+	m_pCamara = new CCamera(filedef->getIntObjectValues("CAM_ASPECT")[0],  // width
+							filedef->getIntObjectValues("CAM_ASPECT")[1],  // height
+							filedef->getIntObjectValues("CAM_ASPECT")[2]); // aspect
+	m_pCamara->position = glm::vec3(filedef->getIntObjectValues("CAM_POSITION")[0], 0.0, filedef->getIntObjectValues("CAM_POSITION")[1]);
 
 	//Create the manager of renderers
-	getRenderManager().loadShadersFromFile(filedef->getObjectValues("SHADERS")[0]);
+	getRenderManager().loadShadersFromFile(filedef->getStringObjectValues("SHADERS")[0]);
 
 	//Create the main terrain
-	getGameObjectManager().CreateGameObject(filedef->getObjectValues("TERRAIN")[0], OBJECT_TYPE::TERRAIN, OBJECT_HIERARCHY_LEVEL::LEVEL_0, 0, 0x0, m_pCamara, this, 0, 0, 0);
+	getGameObjectManager().CreateGameObject(filedef->getStringObjectValues("TERRAIN")[0], OBJECT_TYPE::TERRAIN, OBJECT_HIERARCHY_LEVEL::LEVEL_0, 0, 0x0, m_pCamara, this, 0, 0, 0);
 
 	for (int i=0;i<filedef->getCount("MESH");i++)
 	{

@@ -22,6 +22,7 @@ using std::string;
 typedef struct _key
 {
 	string key;
+	int n_values;
 	string values[MAX_SUBKEYS];
 } key;
 
@@ -61,7 +62,9 @@ public:
 	int getCount(const string &_key);
 
 	/* Gets the values from key */
-	string* getObjectValues(const string &_key);
+	string* getStringObjectValues(const string &_key);
+	float* getFloatObjectValues(const string &_key);
+	int* getIntObjectValues(const string &_key);
 
 	/* Gets the values from key at the 'index' position */
 	string* getObjectValuesIndex(const string &_key, int index);

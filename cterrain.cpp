@@ -2,7 +2,7 @@
 
 #include "cterrain.h"
 
-using namespace TextureManager;
+using namespace MaterialManager;
 
 #define PUNTOS_ALREDEDOR 6
 
@@ -32,21 +32,27 @@ CTerrain::CTerrain(const string file) : CGameObject()
 		m_iId = getObjectId();
 
 		/* Gets the properties */
-		m_fAncho = std::stof(m_File->getObjectValues("ancho")[0]);
-		m_fLargo = std::stof(m_File->getObjectValues("largo")[0]);
-		m_fAlturaMax = std::stof(m_File->getObjectValues("altura")[0]);
-		//m_fTilingFactor = std::stof(m_File->getObjectValues("tilingfactor")[0]);
-		m_texturaHeightfield = m_File->getObjectValues("heightfield")[0];
-		m_SandTexture = m_File->getObjectValues("sand")[0];
-		m_tilingFactorSand = std::stof(m_File->getObjectValues("sand")[1]);
-		m_GrassTexture = m_File->getObjectValues("grass")[0];
-		m_tilingFactorGrass = std::stof(m_File->getObjectValues("grass")[1]);
-		m_DirtTexture = m_File->getObjectValues("dirt")[0];
-		m_tilingFactorDirt = std::stof(m_File->getObjectValues("dirt")[1]);
-		m_SnowTexture = m_File->getObjectValues("snow")[0];
-		m_tilingFactorSnow = std::stof(m_File->getObjectValues("snow")[1]);
-	
+		m_fAncho = m_File->getFloatObjectValues("ancho")[0];
+		m_fLargo = m_File->getFloatObjectValues("largo")[0];
+		m_fAlturaMax = m_File->getFloatObjectValues("altura")[0];
+		m_texturaHeightfield = m_File->getStringObjectValues("heightfield")[0];
+		m_materialsName = m_File->getStringObjectValues("materials")[0];
+
+		m_tilingFactorSand = 1.0;
+		m_tilingFactorGrass = 1.0;
+		m_tilingFactorDirt = 1.0;
+		m_tilingFactorSnow = 1.0;
+
+		/* Load the materials from file */
+		::getMaterialManager().loadMaterialsFromMTL(m_materialsName);
+
 		delete m_File;
+
+		/* Store the materials loadad into terrain data */
+		m_MatSand = *::getMaterialManager().getMaterialByName(string("sand"));
+		m_MatGrass = *::getMaterialManager().getMaterialByName(string("grass"));
+		m_MatDirt = *::getMaterialManager().getMaterialByName(string("dirt"));
+		m_MatSnow = *::getMaterialManager().getMaterialByName(string("snow"));
 
 		//Carga la imagen del mapa de alturas
 		m_pHeightMap = new CBmp(m_texturaHeightfield.c_str());
@@ -134,13 +140,6 @@ CTerrain::CTerrain(const string file) : CGameObject()
 
 		id_buffer = CreateArrayBuffer(&m_Texel[0], m_iNumVertex * sizeof(float) * 2, GL_STATIC_DRAW);
 		CreateAttribArrayBuffer(2, id_buffer, 2);
-
-		//Load texturex - care with texture order from defines -
-		m_SandTextureId = ::getTextureManager().loadTexture(m_SandTexture);
-		m_GrassTextureId = ::getTextureManager().loadTexture(m_GrassTexture);
-		m_DirtTextureId = ::getTextureManager().loadTexture(m_DirtTexture);
-		m_SnowTextureId = ::getTextureManager().loadTexture(m_SnowTexture);
-		//m_GrassTextureId = 2;
 
 		//The terrain has no parents.
 		m_pParent = NULL;

@@ -80,7 +80,7 @@ GLuint CTextureManager::loadTexture(const std::string sTexturePath)
 
 	//Add the new texture and its id
 	pTexture = new CTexture(sTexturePath);
-	
+
 	m_uiTextures = pTexture->getID();
 
 	//Test if texture was loaded ok

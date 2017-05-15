@@ -6,7 +6,6 @@
  */
 #include "stdafx.h"
 
-
 #include "cfbo.h"
 
 CFbo::CFbo()
@@ -37,6 +36,7 @@ CFbo::~CFbo()
 
 void CFbo::Create()
 {
+	GLenum err = 0;
 	//Generate and bind the frame buffer
 	glGenFramebuffers(1, &m_uiFboHandler);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_uiFboHandler);
@@ -45,7 +45,7 @@ void CFbo::Create()
 	glGenTextures(1, &m_uiTextureHandler);
 	glBindTexture(GL_TEXTURE_2D, m_uiTextureHandler);
 #ifdef _OPENGL44_
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB, m_width, m_height);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, m_width, m_height);
 #else
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 #endif
@@ -56,17 +56,18 @@ void CFbo::Create()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_uiTextureHandler, 0);
 
 	//Create the stencil buffer
-	GLuint rboDepthStencil;
+	/*GLuint rboDepthStencil;
 	glGenRenderbuffers(1, &rboDepthStencil);
 	glBindRenderbuffer(GL_RENDERBUFFER, rboDepthStencil);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 512, 512);
-	glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepthStencil);
+	glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepthStencil);*/
 
 	//Create the depth buffer
 	glGenRenderbuffers(1, &m_uiDepthHandler);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_uiDepthHandler);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_uiDepthHandler);
+	err = glGetError();
 
 	//Set the target for the fragment shader output
 	GLenum drawBufs[] = { GL_COLOR_ATTACHMENT0 };

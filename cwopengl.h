@@ -2,27 +2,10 @@
 #define _CWOPENGL_H_
 
 #include "stdafx.h"
-
-#include <iostream>
-
-#ifdef _OPENGL44_
- #include "gl_core_4_4.h"
-#else
- #include "gl_core_3_3.h"
-#endif
 #include "cfiledef.h"
-#include "cwopengl.h"
-#include "utils.h"
 
-#ifdef _OPENGL44_
-	#define OPENGL_VERSION_MAYOR 4
-	#define OPENGL_VERSION_MINOR 4
-#else
-	#define OPENGL_VERSION_MAYOR 3
-	#define OPENGL_VERSION_MINOR 3
-#endif
-
-using namespace Message;
+#define OPENGL_VERSION_MAYOR 4
+#define OPENGL_VERSION_MINOR 4
 
 class CWOpenGL 
 {

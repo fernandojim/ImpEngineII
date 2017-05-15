@@ -1,4 +1,7 @@
 #include "cwopengl.h"
+#include "utils.h"
+
+using namespace Message;
 
 CWOpenGL::CWOpenGL(const char *szFile)
 {
@@ -18,7 +21,7 @@ CWOpenGL::CWOpenGL(const char *szFile)
 		// Gets the properties from file */
 
 		// FULLSCREEN
-		aux = m_File->getObjectValues("FULLSCREEN")[0];
+		aux = m_File->getStringObjectValues("FULLSCREEN")[0];
 		if (aux == "N")
 			m_bfullscreen = false;
 		else if (aux == "Y")
@@ -30,7 +33,7 @@ CWOpenGL::CWOpenGL(const char *szFile)
 		}
 
 		// VERTICAL SYNC
-		aux = m_File->getObjectValues("VSYNC")[0];
+		aux = m_File->getStringObjectValues("VSYNC")[0];
 		if (aux == "N")
 			m_bvsync = false;
 		else if (aux == "Y")
@@ -43,7 +46,7 @@ CWOpenGL::CWOpenGL(const char *szFile)
 		}
 
 		// WINDOW WIDTH
-		m_width = std::stoi(m_File->getObjectValues("WINDOW_RES")[0]);
+		m_width = m_File->getIntObjectValues("WINDOW_RES")[0];
 		if (m_width < 320 || m_width > 1920)
 		{
 			MessageBOX("Window width value invalid", "Engine file error");
@@ -52,7 +55,7 @@ CWOpenGL::CWOpenGL(const char *szFile)
 		}
 
 		// WINDOW HEIGHT
-		m_height = std::stoi(m_File->getObjectValues("WINDOW_RES")[1]);
+		m_height = m_File->getIntObjectValues("WINDOW_RES")[1];
 		if (m_height < 200 || m_height > 1200)
 		{
 			MessageBOX("Window height value invalid", "Engine file error");
@@ -61,7 +64,7 @@ CWOpenGL::CWOpenGL(const char *szFile)
 		}
 
 		// WINDOW DEPTH BITS
-		m_bits = std::stoi(m_File->getObjectValues("WINDOW_RES")[2]);
+		m_bits = m_File->getIntObjectValues("WINDOW_RES")[2];
 		if (m_bits != 8 && m_bits != 16 && m_bits != 24 && m_bits != 32)
 		{
 			MessageBOX("Window bits depth color value invalid", "Engine file error");
@@ -70,7 +73,7 @@ CWOpenGL::CWOpenGL(const char *szFile)
 		}
 
 		// WORLD file
-		m_sWorldFile = m_File->getObjectValues("WORLD")[0];
+		m_sWorldFile = m_File->getStringObjectValues("WORLD")[0];
 		if (m_sWorldFile == "")
 		{
 			MessageBOX("World file not error", "Engine file error");
@@ -156,6 +159,15 @@ void CWOpenGL::Create()
 	{
 		throw std::exception();
 	}
+
+	/*char cad[300];
+	const GLubyte *vendor = glGetString(GL_VENDOR);
+	const GLubyte *renderer = glGetString(GL_RENDERER);
+	const GLubyte *version = glGetString(GL_VERSION);
+	const GLubyte *language = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+	sprintf(cad, "%s\n%s\n%s\n%s", vendor, renderer, version, language);
+	MessageBOX("OpenGL info", cad);*/
 
 	/* This makes our buffer swap syncronized with the monitor's vertical refresh. Parameter: */
 	/* 0 -> without sync refresh */

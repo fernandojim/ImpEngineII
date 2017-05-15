@@ -4,6 +4,7 @@
 #include <string>
 
 #include "cgameobject.h"
+#include "cmaterial.h"
 #include "glm\vec3.hpp"
 #include "glm\vec2.hpp"
 #include "glm/gtc/type_ptr.hpp"	//Header for glm::value_ptr
@@ -39,11 +40,10 @@ public:
 	bool addTexture(GLuint id);
 
 public:
-	//Used textures ids
-	GLuint      m_SandTextureId;
-	GLuint      m_GrassTextureId;
-	GLuint      m_DirtTextureId;
-	GLuint      m_SnowTextureId;
+	CMaterial 	m_MatSand;
+	CMaterial 	m_MatGrass;
+	CMaterial 	m_MatDirt;
+	CMaterial 	m_MatSnow;
 
 	//Tiling texture factors
 	GLfloat		m_tilingFactorSand;
@@ -51,11 +51,8 @@ public:
 	GLfloat		m_tilingFactorDirt;
 	GLfloat		m_tilingFactorSnow;
 
-	//Texture file names
-	std::string		m_SandTexture;
-	std::string     m_GrassTexture;
-	std::string     m_DirtTexture;
-	std::string     m_SnowTexture;
+	//Materials - one material per texture
+	std::string m_materialsName;
 
 public:
 	CTerrain(const string file);

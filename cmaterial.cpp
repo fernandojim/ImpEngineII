@@ -136,6 +136,13 @@ CMaterial::CMaterial()
 void CMaterial::clear()
 {
 	m_sName = "";
+	m_fNs = 0.0;
+	m_vKa.x = m_vKa.y = m_vKa.z = 0.0;
+	m_vKd.x = m_vKd.y = m_vKd.z = 0.0;
+	m_vKs.x = m_vKs.y = m_vKs.z = 0.0;
+	m_fNi = 0.0;
+	m_fd = 0.0;
+	m_iIllum = 0.0;
 	m_iMap_ka_texture = 0;
 	m_iMap_ks_texture = 0;
 	m_iMap_kd_texture = 0;

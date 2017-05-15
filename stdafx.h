@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#include <SDL2-2.0.4\SDL.h>
+#include <SDL.h>
 
 #ifdef _OPENGL44_
  #include "gl_core_4_4.h"

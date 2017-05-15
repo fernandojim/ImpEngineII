@@ -25,6 +25,7 @@ CCamera::CCamera(int h, int w, float aspect)
 	yaw = 0.0;
 	pitch = 0.0;
 
+	m_M4ViewProjectionInverse = glm::mat4(1.0);
 	m_M4view = glm::mat4(1.0);
 	m_M4projection = glm::mat4(1.0);
 	m_M3normal = glm::mat3(1.0);
@@ -270,6 +271,8 @@ void CCamera::Animate(double deltaTime)
 
 	//Matrix normal
 	m_M3normal = glm::inverseTranspose(glm::mat3(m_M4modelView));
+
+	m_M4ViewProjectionInverse = glm::inverse(m_M4projection * m_M4view);
 
 	//Importante el orden de las transformaciones: MVP = proj * view * model
 	m_M4MVP = m_M4projection * m_M4modelView;

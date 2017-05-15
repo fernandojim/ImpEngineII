@@ -21,6 +21,8 @@ using namespace std;
 
 namespace MaterialManager
 {
+	enum TEXTURE_MAP_TYPE {MAP_KA = 0, MAP_KD, MAP_KS};
+
 	class CMaterialManager
 	{
 		private:
@@ -37,6 +39,7 @@ namespace MaterialManager
 			void loadMaterialsFromMTL(const string sMaterialPath);
 
 			CMaterial* getMaterialByName(const string sName);
+			GLuint getTextureId(TEXTURE_MAP_TYPE texType, const string sName);
 
 			bool deleteMaterial(const string sName);
 

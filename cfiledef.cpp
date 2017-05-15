@@ -110,28 +110,33 @@ void CFileDef::readObjectKeysValues()
 					{
 						//Delete key/subkeys
 						m_keys[m_numkeys].key.erase();
+						m_keys[m_numkeys].n_values = 0;
 						for (i = 0; i < MAX_SUBKEYS; i++)
+						{
 							m_keys[m_numkeys].values[i].erase();
+						}
 
 						//Get the main key
 						std::stringstream (line) >> m_keys[m_numkeys].key;
 						
-						if (m_keys[m_numkeys].key.length() + 2 < line.length()) //Avoid error
+						//Avoid error
+						if (m_keys[m_numkeys].key.length() + 2 < line.length())
 							line = line.substr(m_keys[m_numkeys].key.length() + 2, line.length());
 
-						//Get the subkeys if exist
-						i = 0;
-						while (std::stringstream(line) >> m_keys[m_numkeys].values[i])
+						//Get the subkeys for each key
+						for (i = 0;i < MAX_SUBKEYS;i++)
 						{
-							if (m_keys[m_numkeys].values[i].length() >= line.length())
-								break;
-							else
+							if (line.length() > 0)
 							{
-								line = line.substr(m_keys[m_numkeys].values[i].length() + 1, line.length());
-								i++;
+								std::stringstream(line) >> m_keys[m_numkeys].values[i];
+								m_keys[m_numkeys].n_values++;
+								if (m_keys[m_numkeys].values[i].length() < line.length())
+									line = line.substr(m_keys[m_numkeys].values[i].length() + 1, line.length());
+								else
+									break;
 							}
 						}
-						
+
 						//Next key/values
 						m_numkeys++;
 
@@ -184,10 +189,12 @@ string CFileDef::getObjectName()
 }
 
 /* 
-	Get the value associated to key 
+	Get the value associated to key - string
 */
-string* CFileDef::getObjectValues(const string &_key)
+string* CFileDef::getStringObjectValues(const string &_key)
 {
+	string *res = new string();
+
 	for (int i = 0; i < m_numkeys; i++)
 	{
 		if (!m_keys[i].key.compare(_key))
@@ -196,7 +203,49 @@ string* CFileDef::getObjectValues(const string &_key)
 		}
 	}
 
-	return NULL;
+	return res;
+}
+
+/*
+	Get the value associated to key - float
+*/
+float* CFileDef::getFloatObjectValues(const string &_key)
+{
+	float *res = (float*)malloc(sizeof(float) * MAX_SUBKEYS);
+
+	for (int i = 0; i < m_numkeys; i++)
+	{
+		if (!m_keys[i].key.compare(_key))
+		{
+			for (int j = 0;j<m_keys[i].n_values;j++)
+			{
+				res[j] = std::stof(m_keys[i].values[j]);
+			}
+		}
+	}
+
+	return res;
+}
+
+/*
+	Get the value associated to key - int
+*/
+int* CFileDef::getIntObjectValues(const string &_key)
+{
+	int *res = (int*)malloc(sizeof(int) * MAX_SUBKEYS);
+
+	for (int i = 0; i < m_numkeys; i++)
+	{
+		if (!m_keys[i].key.compare(_key))
+		{
+			for (int j = 0;j < m_keys[i].n_values;j++)
+			{
+				res[j] = std::stoi(m_keys[i].values[j]);
+			}
+		}
+	}
+
+	return res;
 }
 
 /*

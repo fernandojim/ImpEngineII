@@ -32,6 +32,8 @@ using namespace GameObjectManager;
 
 CMesh::CMesh(const string name) : CGameObject()
 {
+	m_Material = new CMaterial();
+
 	load(name);
 }
 

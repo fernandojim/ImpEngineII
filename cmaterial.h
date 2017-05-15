@@ -37,15 +37,15 @@ public:
 	float m_fNi;
 	float m_fd;
 	GLuint m_iIllum;
-	std::string m_sMap_ka;   //Texture ambient map
-	std::string m_sMap_kd;   //Texture diffuse map
-	std::string m_sMap_ks;   //Texture specular map
-	std::string m_sMap_Bump; //Texture bump mapping
-
 	GLuint m_iMap_ka_texture;   //Texture id for Ambient
 	GLuint m_iMap_ks_texture;   //Texture id for Specular
 	GLuint m_iMap_kd_texture;   //Texture id for Diffuse
 	GLuint m_iMap_Bump_texture; //Texture id for Bump mapping
+
+	std::string m_sMap_ka;   //Texture ambient map
+	std::string m_sMap_kd;   //Texture diffuse map
+	std::string m_sMap_ks;   //Texture specular map
+	std::string m_sMap_Bump; //Texture bump mapping
 
 public:
 	CMaterial(std::string file);

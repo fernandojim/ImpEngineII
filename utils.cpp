@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include <windows.h>
 #include "utils.h"
 
 namespace ansiCToUnicode
@@ -19,11 +20,10 @@ namespace Message
 	void MessageBOX(const char* title, const char* message)
 	{
 #ifdef _VSTUDIO
-		MessageBox(NULL, ansiCToUnicode::ansiCToUnicode(title).c_str(),
+		MessageBox(GetActiveWindow(), ansiCToUnicode::ansiCToUnicode(title).c_str(),
 			ansiCToUnicode::ansiCToUnicode(message).c_str(), MB_OK);
 #else   //Eclipse Mars2 5.11
-		MessageBox(NULL, title, message, MB_OK);
+		MessageBox(GetActiveWindow(), message, title, MB_OK);
 #endif
-		exit(0);
 	}
 }

@@ -4,7 +4,7 @@
 #ifndef _NVERTEX_H_
 #define _NVERTEX_H_
 
-#include "gl_core_3_3.h"
+#include "gl_core_4_4.h"
 
 namespace NVERTEX
 {

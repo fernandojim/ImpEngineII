@@ -3,6 +3,8 @@
 #include "cshader.h"
 #include "utils.h"
 
+using namespace Message;
+
 CShader::CShader(const char* vs, const char* fs)
 {
 	m_err = CreaShaders(vs, fs);
@@ -43,7 +45,7 @@ ERROR_TYPE CShader::CompilaShaders()
 	{
 		glGetShaderInfoLog(m_uiVertexShader, MAX_INFO_LOG, NULL, m_sLogCompileStatusVertexShader);
 
-		MessageBOX(m_sLogCompileStatusVertexShader, "Vertex Shader compile error");
+		MessageBOX("Vertex Shader compile error", m_sLogCompileStatusVertexShader);
 
 		return VS_COMPILE_ERROR;
 	}
@@ -59,7 +61,7 @@ ERROR_TYPE CShader::CompilaShaders()
 	{
 		glGetShaderInfoLog(m_uiFragmentShader, MAX_INFO_LOG, NULL, m_sLogCompileStatusFragmentShader);
 
-		MessageBOX(m_sLogCompileStatusFragmentShader, "Fragment Shader compile error");
+		MessageBOX("Fragment Shader compile error", m_sLogCompileStatusFragmentShader);
 
 		return FS_COMPILE_ERROR;
 	}
@@ -87,7 +89,7 @@ ERROR_TYPE CShader::LinkaShaders()
 		//Visualiza mensaje de error
 		if (strlen(m_sLogLinkStatusShaders) > 0)
 		{
-			MessageBOX(m_sLogLinkStatusShaders, "Shader linker error");
+			MessageBOX("Shader linker error", m_sLogLinkStatusShaders);
 		}
 		
 		//We don't need the program anymore.
@@ -149,43 +151,44 @@ ERROR_TYPE CShader::getError()
 
 void CShader::setUniformShader1f(const string variable, GLfloat v1)
 {
-	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
 	glUniform1f(val, v1);
 }
 
 void CShader::setUniformShader1i(const string variable, GLint v1)
 {
-	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
 	glUniform1i(val, v1);
 }
 
 void CShader::setUniformShader2fv(const string variable, GLsizei count, const GLfloat *value)
 {
-	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	if (val == -1)
 	glUniform2fv(val, count, &value[0]);
 }
 
 void CShader::setUniformShader3fv(const string variable, GLsizei count, const GLfloat *value)
 {
-	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
 	glUniform3fv(val, count, &value[0]);
 }
 
 void CShader::setUniformShaderMatrix3fv(const string &variable, GLsizei count, GLboolean traspose, const GLfloat *value)
 {
-	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
 	glUniformMatrix3fv(val, count, traspose, &value[0]);
 }
 
 void CShader::setUniformShaderMatrix4fv(const string variable, GLsizei count, GLboolean traspose, const GLfloat *value)
 {
-	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
 	glUniformMatrix4fv(val, count, traspose, &value[0]);
 }
 
 void CShader::setUniformShaderTexture2D(const string variable, GLuint textureid)
 {
-	GLuint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
 	glUniform1i(val, textureid);
 	glActiveTexture(GL_TEXTURE0 + textureid);
 	glBindTexture(GL_TEXTURE_2D, textureid);

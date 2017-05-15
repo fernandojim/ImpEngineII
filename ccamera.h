@@ -66,6 +66,7 @@ public:
 	glm::mat4 m_M4modelView;
 	glm::mat3 m_M3normal;
 	glm::mat4 m_M4MVP;
+	glm::mat4 m_M4ViewProjectionInverse;
 };
 
 #endif
