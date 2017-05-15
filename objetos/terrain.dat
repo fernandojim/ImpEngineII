@@ -7,8 +7,5 @@
 	altura 1000.0
 	tilingfactor 1.0
 	heightfield texturas\sierranevada.bmp
-	sand texturas\sand.bmp 0.1
-	grass texturas\grass1024.bmp 4.0
-	dirt texturas\dirt.JPG 1.0
-	snow texturas\snow.bmp 1.0
+	materials materials\terrain.mtl
 }

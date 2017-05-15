@@ -9,13 +9,9 @@
 {
 	# lights
 	LIGHT 0
-	POSITION 1000.0 1000.0 1000.0
-	INTENSITY 0.9 0.9 0.9
-	KA 0.4 0.4 0.4
-	KD 0.4 0.4 0.4
-	KS 0.4 0.4 0.4
-	SHININESS 1.0
-
+	POSITION -1000.0 100.0 -1000.0
+	INTENSITY 0.95 0.5 0.1
+	
 	# camera
 	CAM_POSITION 10.0 10.0
 	CAM_ASPECT 800 600 50.0
@@ -27,12 +23,12 @@
 	TERRAIN objetos\terrain.dat
 
 	# meshes
-	#MESH tank1 objetos\tank.obj 110.0 0.0 100.0
-	#MESH tank2 objetos\tank.obj 130.0 0.0 100.0
-	#MESH tank3 objetos\tank.obj 150.0 0.0 100.0
-	#MESH rock1 objetos\rock.obj 170.0 0.0 100.0
-	#MESH rock2 objetos\rock.obj 190.0 0.0 100.0
-	#MESH rock3 objetos\rock.obj 210.0 0.0 100.0
+	MESH tank1 objetos\tank.obj 110.0 0.0 100.0
+	MESH tank2 objetos\tank.obj 130.0 0.0 100.0
+	MESH tank3 objetos\tank.obj 150.0 0.0 100.0
+	MESH rock1 objetos\rock.obj 170.0 0.0 100.0
+	MESH rock2 objetos\rock.obj 190.0 0.0 100.0
+	MESH rock3 objetos\rock.obj 210.0 0.0 100.0
 	MESH box1 objetos\box.obj 40.0 0.0 40.0
 
 	# MD2 models
