@@ -1,4 +1,4 @@
-#version 330 core
+#version 440 core
 
 layout (location = 0) out vec4 vFragColor;
 
@@ -6,20 +6,32 @@ struct light
 {
 	vec3 lightPosition;
 	vec3 lightIntensity;
+};
+
+struct material
+{
+	float shininess; //o Ns
 	vec3 ka;
 	vec3 kd;
 	vec3 ks;
-	float shininess;
+	//float Ni;
+	//int illum;
+	//sampler2D tex_ka;
+	sampler2D tex_kd;
+	//sampler2D tex_ks;
 };
 
 uniform float altmax;
-uniform float tilingfactor;
 uniform light luz1;
+uniform material material1;
+uniform material material2;
+uniform material material3;
+uniform material material4;
 uniform vec3 camera_pos;
 
-in vec2 varyingTexCoord;
 in float altura;
 
+in vec2 texCoord;
 smooth in vec3 eyeCoord;
 smooth in vec3 eyeNormal;
 
@@ -28,18 +40,30 @@ uniform float tilingFactorGrass;
 uniform float tilingFactorDirt;
 uniform float tilingFactorSnow;
 
-uniform sampler2D texturasand;
-uniform sampler2D texturagrass;
-uniform sampler2D texturadirt;
-uniform sampler2D texturasnow;
+//View Projection inverse matrix
+uniform mat4 m4vpi;
+uniform sampler2D texturafrmb;
 
 void main()
 {
-	vec4 colorsand = texture(texturasand, varyingTexCoord * tilingFactorSand);
-	vec4 colorgrass = texture(texturagrass, varyingTexCoord * tilingFactorGrass);
-	vec4 colordirt = texture(texturadirt, varyingTexCoord * tilingFactorDirt);
-	vec4 colorsnow = texture(texturasnow, varyingTexCoord * tilingFactorSnow);
+	//Crea los colores a partir de las texturas
+	vec4 colorsand = texture2D(material1.tex_kd, texCoord * tilingFactorSand);
+	vec4 colorgrass = texture2D(material2.tex_kd, texCoord * tilingFactorGrass);
+	vec4 colordirt = texture2D(material3.tex_kd, texCoord * tilingFactorDirt);
+	vec4 colorsnow = texture2D(material4.tex_kd, texCoord * tilingFactorSnow);
+
+	vec3 n = normalize( eyeNormal );
+    vec3 s = normalize( luz1.lightPosition - eyeCoord );
+    vec3 v = normalize( -eyeCoord );
+	vec3 r = reflect( -s, n );
+	vec3 h = normalize( v + s );
 	
+	//Aplica iluminacion a cada color de textura
+	colorsand = colorsand * vec4( luz1.lightIntensity * (material1.ka + material1.kd * max( dot( s, eyeNormal), 0.0 ) + material1.ks * pow(max(dot(h,n), 0.0), material1.shininess) ), 1.0);
+	colorgrass = colorgrass * vec4( luz1.lightIntensity * (material2.ka + material2.kd * max( dot( s, eyeNormal), 0.0 ) + material2.ks * pow(max(dot(h,n), 0.0), material2.shininess) ), 1.0);
+	colordirt = colordirt * vec4( luz1.lightIntensity * (material3.ka + material3.kd * max( dot( s, eyeNormal), 0.0 ) + material3.ks * pow(max(dot(h,n), 0.0), material3.shininess) ), 1.0);
+	colorsnow = colorsnow * vec4( luz1.lightIntensity * (material4.ka + material4.kd * max( dot( s, eyeNormal), 0.0 ) + material4.ks * pow(max(dot(h,n), 0.0), material4.shininess) ), 1.0);
+			
 	if ( altura >= 0.0 && altura <= 100.0 )
 		vFragColor = colorgrass;
 	else if ( altura <= 250.0 )
@@ -50,12 +74,6 @@ void main()
 		vFragColor = mix(colordirt, colorsnow, smoothstep(400.0, 700.0, altura));
 	else
 		vFragColor = colorsnow;
-
-	vec3 n = normalize( eyeNormal );
-    vec3 s = normalize( luz1.lightPosition - eyeCoord );
-    vec3 v = normalize( -eyeCoord );
-	vec3 r = reflect( -s, n );
-	vec3 h = normalize( v + s );
-	
-	vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);
+		
+	//vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);
 }

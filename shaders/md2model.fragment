@@ -1,4 +1,4 @@
-#version 330
+#version 440 core
 
 layout (location = 0) out vec4 vFragColor;
 
@@ -6,6 +6,10 @@ struct light
 {
 	vec3 lightPosition;
 	vec3 lightIntensity;
+};
+
+struct material
+{
 	vec3 ka;
 	vec3 kd;
 	vec3 ks;
@@ -13,6 +17,7 @@ struct light
 };
 
 uniform light luz1;
+uniform material material1;
 
 uniform sampler2D textureMeshDiffuse;
 
@@ -33,5 +38,5 @@ void main()
 
 	vFragColor = texture(textureMeshDiffuse, fs_in.varyingTexCoord);
 
-	vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, fs_in.eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);
+	vFragColor = vFragColor * vec4( luz1.lightIntensity * ( material1.ka + material1.kd * max( dot( s, fs_in.eyeNormal), 0.0 ) + material1.ks * pow(max(dot(h,n), 0.0), material1.shininess) ), 1.0);
 }
