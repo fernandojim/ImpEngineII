@@ -227,6 +227,7 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 		     //
 		     //Textures
 		     //
+		     mesh_shader->setUniformShader1i("valid_tex", mesh->m_Material->m_iMap_kd_texture);
 		     mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", mesh->m_Material->m_iMap_kd_texture);
 		     //mesh_shader->setUniformShaderTexture2D("textureMeshDiffuse", ::getGameObjectManager().m_fbo->m_uiTextureHandler);
 
@@ -235,6 +236,13 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 			 //
 			 mesh_shader->setUniformShader3fv("luz1.lightPosition", 1, glm::value_ptr(mesh->m_world->m_Lights[0].m_light.lightPosition));
 			 mesh_shader->setUniformShader3fv("luz1.lightIntensity", 1, glm::value_ptr(mesh->m_world->m_Lights[0].m_light.lightIntensity));
+
+			 //
+			 //fog
+			 //
+			 mesh_shader->setUniformShader1f("fog1.maxDist", 400.0);
+			 mesh_shader->setUniformShader1f("fog1.minDist", 10.0);
+			 mesh_shader->setUniformShader3fv("fog1.fogColor", 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
 
 			 //
 			 //Materials

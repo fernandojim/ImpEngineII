@@ -257,13 +257,13 @@ void CCamera::Animate(double deltaTime)
 	vectorVelocidad = glm::normalize(lookAt - position) * glm::length(velocity);
 	vectorVelocidad.y = 0.0;
 
-	/*position.x = 500.0;
-	position.y = 200.0;
-	position.z = 150.0;
+	/*position.x = -500.0;
+	position.y = 1000.0;
+	position.z = -500.0;
 
-	lookAt.x = 0.0;
+	lookAt.x = 1000.0;
 	lookAt.y = 0.0;
-	lookAt.z = 0.0;*/
+	lookAt.z = 1000.0;*/
 
 	//Calcula matriz modelview
 	m_M4view = glm::lookAt(position, lookAt, up);
