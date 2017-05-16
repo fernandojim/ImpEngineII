@@ -10,14 +10,14 @@ uniform mat3 m3normal;    //Normal matrix
 
 out VS_OUT
 {
-	vec3 eyeCoord;
-	vec3 eyeNormal;
+	smooth vec3 eyeCoord;
+	smooth vec3 eyeNormal;
 	vec2 varyingTexCoord;
 } vs_out;
 
 void main()
 {
-	vs_out.eyeNormal = normalize(m3normal * Normal);
+	vs_out.eyeNormal = m3normal * Normal;
     vs_out.eyeCoord = vec3(m4modelview * vec4(Vertex, 1.0));
     vs_out.varyingTexCoord = Texel;
 	

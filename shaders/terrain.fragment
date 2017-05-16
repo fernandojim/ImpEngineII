@@ -6,7 +6,16 @@ struct light
 {
 	vec3 lightPosition;
 	vec3 lightIntensity;
+}; 
+uniform light luz1;
+
+struct fogInfo
+{
+	float maxDist;
+	float minDist;
+	vec3 fogColor;
 };
+uniform fogInfo fog1;
 
 struct material
 {
@@ -20,25 +29,24 @@ struct material
 	sampler2D tex_kd;
 	//sampler2D tex_ks;
 };
-
-uniform float altmax;
-uniform light luz1;
 uniform material material1;
 uniform material material2;
 uniform material material3;
 uniform material material4;
-uniform vec3 camera_pos;
-
-in float altura;
-
-in vec2 texCoord;
-smooth in vec3 eyeCoord;
-smooth in vec3 eyeNormal;
 
 uniform float tilingFactorSand;
 uniform float tilingFactorGrass;
 uniform float tilingFactorDirt;
 uniform float tilingFactorSnow;
+
+uniform float altmax;
+uniform vec3 camera_pos;
+
+in float altura;
+in vec2 texCoord;
+smooth in vec3 eyeCoord;
+smooth in vec3 eyeNormal;
+in vec3 normal_map;
 
 //View Projection inverse matrix
 uniform mat4 m4vpi;
@@ -55,25 +63,29 @@ void main()
 	vec3 n = normalize( eyeNormal );
     vec3 s = normalize( luz1.lightPosition - eyeCoord );
     vec3 v = normalize( -eyeCoord );
-	vec3 r = reflect( -s, n );
 	vec3 h = normalize( v + s );
 	
 	//Aplica iluminacion a cada color de textura
-	colorsand = colorsand * vec4( luz1.lightIntensity * (material1.ka + material1.kd * max( dot( s, eyeNormal), 0.0 ) + material1.ks * pow(max(dot(h,n), 0.0), material1.shininess) ), 1.0);
-	colorgrass = colorgrass * vec4( luz1.lightIntensity * (material2.ka + material2.kd * max( dot( s, eyeNormal), 0.0 ) + material2.ks * pow(max(dot(h,n), 0.0), material2.shininess) ), 1.0);
-	colordirt = colordirt * vec4( luz1.lightIntensity * (material3.ka + material3.kd * max( dot( s, eyeNormal), 0.0 ) + material3.ks * pow(max(dot(h,n), 0.0), material3.shininess) ), 1.0);
-	colorsnow = colorsnow * vec4( luz1.lightIntensity * (material4.ka + material4.kd * max( dot( s, eyeNormal), 0.0 ) + material4.ks * pow(max(dot(h,n), 0.0), material4.shininess) ), 1.0);
-			
-	if ( altura >= 0.0 && altura <= 100.0 )
+	colorsand = colorsand   * vec4( luz1.lightIntensity * (material1.ka + material1.kd * max( dot( s, n), 0.0 ) + material1.ks * pow( max( dot( h, n ), 0.0), material1.shininess) ), 1.0);
+	colorgrass = colorgrass * vec4( luz1.lightIntensity * (material2.ka + material2.kd * max( dot( s, n), 0.0 ) + material2.ks * pow( max( dot( h, n ), 0.0), material2.shininess) ), 1.0);
+	colordirt = colordirt   * vec4( luz1.lightIntensity * (material3.ka + material3.kd * max( dot( s, n), 0.0 ) + material3.ks * pow( max( dot( h, n ), 0.0), material3.shininess) ), 1.0);
+	colorsnow = colorsnow   * vec4( luz1.lightIntensity * (material4.ka + material4.kd * max( dot( s, n), 0.0 ) + material4.ks * pow( max( dot( h, n ), 0.0), material4.shininess) ), 1.0);
+	
+	//Crea el fundido de texturas segun la altura del terreno
+	if ( altura < 105.0 )
+		vFragColor = colorsand;
+	else if ( altura >= 105.0 && altura < 115.0 )
+		vFragColor = mix(colorsand, colorgrass, smoothstep(105.0, 115.0, altura));
+	else if ( altura < 400.0 )
 		vFragColor = colorgrass;
-	else if ( altura <= 250.0 )
-		vFragColor = mix(colorgrass, colordirt, smoothstep(150.0, 250.0, altura));
-	else if ( altura >= 250.0 && altura <= 400.0 )
-		vFragColor = colordirt;
-	else if ( altura >= 400.0 && altura <= 700.0 )
-		vFragColor = mix(colordirt, colorsnow, smoothstep(400.0, 700.0, altura));
+	else if (altura >= 400.0 && altura <= 500.0 )
+		vFragColor = mix(colorgrass, colorsnow, smoothstep(400.0, 500.0, altura));
 	else
 		vFragColor = colorsnow;
-		
-	//vFragColor = vFragColor * vec4( luz1.lightIntensity * ( luz1.ka + luz1.kd * max( dot( s, eyeNormal), 0.0 ) + luz1.ks * pow(max(dot(h,n), 0.0), luz1.shininess) ), 1.0);
+	
+	float dist = length( eyeCoord );
+	float fogFactor = ( fog1.maxDist - dist ) / ( fog1.maxDist - fog1.minDist );
+	fogFactor = clamp( fogFactor, 0.0, 1.0 );
+	vec3 color = mix( fog1.fogColor, vFragColor.rgb, fogFactor );
+	vFragColor = vec4( color, 1.0 );
 }

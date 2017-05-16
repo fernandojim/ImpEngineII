@@ -14,13 +14,17 @@ out vec2 texCoord;
 smooth out vec3 eyeCoord;
 smooth out vec3 eyeNormal;
 
+out vec3 normal_map;
+
 void main()
 {
-	eyeNormal = normalize(m3normal * Normal);
+	eyeNormal = m3normal * Normal;
     eyeCoord = vec3(m4modelview * vec4(Vertex, 1.0));
-    
+           
 	texCoord = Texel;
 	altura = Vertex.y;
+	
+	normal_map = Normal;
 
 	gl_Position =  m4mvp * vec4(Vertex, 1.0);
 }
