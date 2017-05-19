@@ -4,7 +4,7 @@
 {
 	ancho 100.0
 	largo 100.0
-	altura 1000.0
+	altura 1500.0
 	tilingfactor 1.0
 	heightfield texturas\sierranevada.bmp
 	materials materials\terrain.mtl

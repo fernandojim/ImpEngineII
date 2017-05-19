@@ -11,9 +11,13 @@
 	LIGHT 0
 	POSITION 1000.0 1000.0 1000.0
 	INTENSITY 1.0 1.0 1.0
+
+	# fog
+	FOG_COLOR 0.6 0.6 0.6
+	DISTANCE 10.0 2500.0
 	
 	# camera
-	CAM_POSITION 500.0 100.0
+	CAM_POSITION 600.0 600.0
 	CAM_ASPECT 800 600 50.0
 
 	# shaders
@@ -22,6 +26,9 @@
 	# terrain
 	TERRAIN objetos\terrain.dat
 
+	#Sky box
+	SKYBOX objetos\skybox.dat
+
 	# meshes
 	#MESH tank1 objetos\tank.obj 110.0 0.0 100.0
 	#MESH tank2 objetos\tank.obj 130.0 0.0 100.0
@@ -29,9 +36,9 @@
 	#MESH rock1 objetos\rock.obj 170.0 0.0 100.0
 	#MESH rock2 objetos\rock.obj 190.0 0.0 100.0
 	#MESH rock3 objetos\rock.obj 210.0 0.0 100.0
-	#MESH box1 objetos\box.obj 40.0 0.0 40.0
-	MESH sphere1 objetos\sphere.obj 40.0 0.0 100.0
-
+	MESH box1 objetos\box.obj 40.0 0.0 40.0
+	
 	# MD2 models
-	MD2 imp1 objetos\imp.md2 50.0 50.0 50.0
+	#MD2 imp1 objetos\imp.md2 50.0 50.0 50.0
+	#MD2 imp2 objetos\imp.md2 30.0 20.0 30.0
 }

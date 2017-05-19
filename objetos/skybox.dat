@@ -1,0 +1,12 @@
+# Definicion del sky box
+
+-skybox
+{
+	MESH objetos\skybox.obj
+	UP texturas\skymap\ss_up.tga
+	DOWN texturas\skymap\ss_dn.tga
+	LEFT texturas\skymap\ss_lf.tga
+	RIGHT texturas\skymap\ss_rt.tga
+	FRONT texturas\skymap\ss_ft.tga
+	BACK texturas\skymap\ss_bk.tga
+}
