@@ -14,7 +14,8 @@ out vec2 texCoord;
 smooth out vec3 eyeCoord;
 smooth out vec3 eyeNormal;
 
-out vec3 normal_map;
+out vec3 world_coord;
+out vec3 world_normal;
 
 void main()
 {
@@ -24,7 +25,8 @@ void main()
 	texCoord = Texel;
 	altura = Vertex.y;
 	
-	normal_map = Normal;
+	world_coord = Vertex;
+	world_normal = Normal;
 
 	gl_Position =  m4mvp * vec4(Vertex, 1.0);
 }

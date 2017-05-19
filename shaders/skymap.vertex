@@ -1,0 +1,14 @@
+#version 440 core
+
+layout(location = 5) in vec3 Vertex;
+
+uniform mat4 m4mvp;       //Model View Projection matrix
+
+out vec3 texCoord0;
+
+void main()
+{
+	vec4 WVP_Pos = m4mvp * vec4(Vertex, 1.0);
+	gl_Position = WVP_Pos.xyww;
+	texCoord0 = normalize(Vertex);
+}

@@ -7,6 +7,15 @@ struct light
 	vec3 lightPosition;
 	vec3 lightIntensity;
 };
+uniform light luz1;
+
+struct fogInfo
+{
+	float maxDist;
+	float minDist;
+	vec3 fogColor;
+};
+uniform fogInfo fog1;
 
 struct material
 {
@@ -17,7 +26,6 @@ struct material
 };
 
 uniform int valid_tex;
-uniform light luz1;
 uniform material material1;
 
 uniform sampler2D textureMeshDiffuse;
@@ -42,4 +50,11 @@ void main()
 	}
 	else
 		vFragColor = vec4( luz1.lightIntensity * (material1.ka + material1.kd * max( dot( s, n), 0.0 ) + material1.ks * pow( max( dot( h, n ), 0.0), material1.shininess) ), 1.0);
+		
+	//Aplies the fog color
+	float dist = length( fs_in.eyeCoord );
+	float fogFactor = ( fog1.maxDist - dist ) / ( fog1.maxDist - fog1.minDist );
+	fogFactor = clamp( fogFactor, 0.0, 1.0 );
+	vec3 color = mix( fog1.fogColor, vFragColor.rgb, fogFactor );
+	vFragColor = vec4( color, 1.0 );
 }

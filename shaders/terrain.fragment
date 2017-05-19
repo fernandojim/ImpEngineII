@@ -46,7 +46,8 @@ in float altura;
 in vec2 texCoord;
 smooth in vec3 eyeCoord;
 smooth in vec3 eyeNormal;
-in vec3 normal_map;
+in vec3 world_coord;
+in vec3 world_normal;
 
 //View Projection inverse matrix
 uniform mat4 m4vpi;
@@ -57,8 +58,14 @@ void main()
 	//Crea los colores a partir de las texturas
 	vec4 colorsand = texture2D(material1.tex_kd, texCoord * tilingFactorSand);
 	vec4 colorgrass = texture2D(material2.tex_kd, texCoord * tilingFactorGrass);
-	vec4 colordirt = texture2D(material3.tex_kd, texCoord * tilingFactorDirt);
+	vec4 colordirtX = texture2D(material3.tex_kd, world_coord.yz * tilingFactorDirt);
+	vec4 colordirtY = texture2D(material3.tex_kd, world_coord.xz * tilingFactorDirt);
+	vec4 colordirtZ = texture2D(material3.tex_kd, world_coord.xy * tilingFactorDirt);
 	vec4 colorsnow = texture2D(material4.tex_kd, texCoord * tilingFactorSnow);
+	
+	vec3 blend = abs(world_normal);
+	blend /= blend.x + blend.y + blend.z + 0.001f;
+	vec4 colordirt = blend.x * colordirtX + blend.y * colordirtY + blend.z * colordirtZ;
 
 	vec3 n = normalize( eyeNormal );
     vec3 s = normalize( luz1.lightPosition - eyeCoord );
@@ -76,16 +83,22 @@ void main()
 		vFragColor = colorsand;
 	else if ( altura >= 105.0 && altura < 115.0 )
 		vFragColor = mix(colorsand, colorgrass, smoothstep(105.0, 115.0, altura));
-	else if ( altura < 400.0 )
+	else if ( altura < 300.0 )
 		vFragColor = colorgrass;
-	else if (altura >= 400.0 && altura <= 500.0 )
-		vFragColor = mix(colorgrass, colorsnow, smoothstep(400.0, 500.0, altura));
+	else if (altura >= 300.0 && altura <= 600.0 )
+		vFragColor = mix(colorgrass, colordirt, smoothstep(300.0, 600.0, altura));
+	else if ( altura < 1000.0)
+		vFragColor = colordirt;
+	else if ( altura >= 1000.0 && altura < 1500.0 )
+		vFragColor = mix(colordirt, colorsnow, smoothstep(1000.0, 1500.0, altura));
 	else
 		vFragColor = colorsnow;
 	
-	float dist = length( eyeCoord );
+		
+	//Aplies the fog color
+	/*float dist = length( eyeCoord );
 	float fogFactor = ( fog1.maxDist - dist ) / ( fog1.maxDist - fog1.minDist );
 	fogFactor = clamp( fogFactor, 0.0, 1.0 );
 	vec3 color = mix( fog1.fogColor, vFragColor.rgb, fogFactor );
-	vFragColor = vec4( color, 1.0 );
+	vFragColor = vec4( color, 1.0 );*/
 }
