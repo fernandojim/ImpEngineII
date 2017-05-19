@@ -19,6 +19,7 @@ protected:
 	CFileDef *m_File;
 
 private:
+	void InitScene();
 	void Create();
 	void Resize();
 	void Finalize();

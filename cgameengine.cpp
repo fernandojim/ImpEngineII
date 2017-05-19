@@ -21,8 +21,6 @@ void CGameEngine::Clear()
 void CGameEngine::OnPrepare()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 }
 
 void CGameEngine::CheckInput(double deltaTime)
@@ -139,14 +137,14 @@ void CGameEngine::GameCycle(double deltaTime)
 	/* Manage the input events */
 	CheckInput(deltaTime);
 
-	// move/orient camera
-	m_gameCamera->Animate(deltaTime);
-
 	// update world
 	m_gameWorld->Update();
 
 	// move/orient objects
 	m_gameWorld->Animate(deltaTime);
+
+	// move/orient camera
+	m_gameCamera->Animate(deltaTime);
 
 	// draw objects
 	m_gameWorld->Draw(m_gameCamera);

@@ -97,15 +97,15 @@ CShader* CRenderManager::getShaderByName(const string sName)
 
 void CRenderManager::Render()
 {
-	::getGameObjectManager().m_fbo->BindFBO();
+	/*::getGameObjectManager().m_fbo->BindFBO();
 	getRenderManager().Render(getGameObjectManager().m_GameObjectTerrain);
 	//getRenderManager().Render(getGameObjectManager().m_GameObjectsMesh);
 	getRenderManager().Render(getGameObjectManager().m_GameObjectsMD2);
 	::getGameObjectManager().m_fbo->UnbindFBO();
-	glViewport(0,0,800,600);
+	glViewport(0,0,800,600);*/
 
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClearColor(0.5, 0.5, 0.5, 1.0);
+
 	getRenderManager().Render(getGameObjectManager().m_GameObjectTerrain);
 	getRenderManager().Render(getGameObjectManager().m_GameObjectsMesh);
 	getRenderManager().Render(getGameObjectManager().m_GameObjectsMD2);
@@ -154,6 +154,13 @@ void CRenderManager::Render(std::vector < CTerrain > & terrains)
 			//
 			terrain_shader->setUniformShader3fv("luz1.lightPosition", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.lightPosition));
 			terrain_shader->setUniformShader3fv("luz1.lightIntensity", 1, glm::value_ptr(terr->m_world->m_Lights[0].m_light.lightIntensity));
+
+			//
+			//fog
+			//
+			terrain_shader->setUniformShader1f("fog1.maxDist", terr->m_world->m_fog.maxDist);
+			terrain_shader->setUniformShader1f("fog1.minDist", terr->m_world->m_fog.minDist);
+			terrain_shader->setUniformShader3fv("fog1.fogColor", 1, glm::value_ptr(terr->m_world->m_fog.fogColor));
 
 			//
 			//Materials
@@ -240,9 +247,9 @@ void CRenderManager::Render(std::vector < CMesh > & meshes)
 			 //
 			 //fog
 			 //
-			 mesh_shader->setUniformShader1f("fog1.maxDist", 400.0);
-			 mesh_shader->setUniformShader1f("fog1.minDist", 10.0);
-			 mesh_shader->setUniformShader3fv("fog1.fogColor", 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+			 mesh_shader->setUniformShader1f("fog1.maxDist", mesh->m_world->m_fog.maxDist);
+			 mesh_shader->setUniformShader1f("fog1.minDist", mesh->m_world->m_fog.minDist);
+			 mesh_shader->setUniformShader3fv("fog1.fogColor", 1, glm::value_ptr(mesh->m_world->m_fog.fogColor));
 
 			 //
 			 //Materials
@@ -313,6 +320,13 @@ void CRenderManager::Render(std::vector < CMd2model > & md2)
 			md2model_shader->setUniformShader3fv("material1.kd", 1, glm::value_ptr(kd));
 			md2model_shader->setUniformShader3fv("material1.ks", 1, glm::value_ptr(ks));
 			md2model_shader->setUniformShader1f("material1.shininess", shininess);
+
+			//
+			//fog
+			//
+			md2model_shader->setUniformShader1f("fog1.maxDist", md2model->m_world->m_fog.maxDist);
+			md2model_shader->setUniformShader1f("fog1.minDist", md2model->m_world->m_fog.minDist);
+			md2model_shader->setUniformShader3fv("fog1.fogColor", 1, glm::value_ptr(md2model->m_world->m_fog.fogColor));
 
 			//
 			//Transformation Matrices

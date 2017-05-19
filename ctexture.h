@@ -29,6 +29,9 @@ private:
 	long         m_lWidth;
 	BYTE        *m_Pixeldata;
 
+	// RGB or BGR
+	GLenum       m_rgbAlignment; //GL_RGB or GL_BGR
+
 public:
 	CTexture(std::string sFilename);	//Constructor
 	~CTexture();						//Destructor

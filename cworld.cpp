@@ -22,8 +22,8 @@ CWorld::CWorld(string sz_file)
 		//Read values from file
 		filedef->readObjectKeysValues();
 
-		//Crea luces
-		// luz 0
+		//Lights
+		// light 0
 		light = filedef->getIntObjectValues("LIGHT")[light];
 
 		m_Lights[light].m_light.lightPosition.x = filedef->getFloatObjectValues("POSITION")[0];
@@ -33,6 +33,14 @@ CWorld::CWorld(string sz_file)
 		m_Lights[light].m_light.lightIntensity.x = filedef->getFloatObjectValues("INTENSITY")[0];
 		m_Lights[light].m_light.lightIntensity.y = filedef->getFloatObjectValues("INTENSITY")[1];
 		m_Lights[light].m_light.lightIntensity.z = filedef->getFloatObjectValues("INTENSITY")[2];
+
+		//Fog
+		m_fog.fogColor.x = filedef->getFloatObjectValues("FOG_COLOR")[0];
+		m_fog.fogColor.y = filedef->getFloatObjectValues("FOG_COLOR")[1];
+		m_fog.fogColor.z = filedef->getFloatObjectValues("FOG_COLOR")[2];
+
+		m_fog.minDist = filedef->getFloatObjectValues("DISTANCE")[0];
+		m_fog.maxDist = filedef->getFloatObjectValues("DISTANCE")[1];
 	}
 
 	//Establecemos la cámara de la escena
@@ -40,6 +48,9 @@ CWorld::CWorld(string sz_file)
 							filedef->getIntObjectValues("CAM_ASPECT")[1],  // height
 							filedef->getIntObjectValues("CAM_ASPECT")[2]); // aspect
 	m_pCamara->position = glm::vec3(filedef->getIntObjectValues("CAM_POSITION")[0], 0.0, filedef->getIntObjectValues("CAM_POSITION")[1]);
+
+	//Creates the Sky map as a cube map
+	m_cubeMap = new CCubemap(filedef->getStringObjectValues("SKYBOX")[0]);
 
 	//Create the manager of renderers
 	getRenderManager().loadShadersFromFile(filedef->getStringObjectValues("SHADERS")[0]);
@@ -70,6 +81,7 @@ void CWorld::Update()
 
 void CWorld::Draw(CCamera *c)
 {
+	m_cubeMap->Render(c);
 	getRenderManager().Render();
 }
 

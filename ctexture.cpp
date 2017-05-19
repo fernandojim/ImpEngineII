@@ -17,11 +17,18 @@ CTexture::CTexture(std::string sFilename)
 	// No error at the beginning
 	m_error = false;
 
+	//Aligment is RGB by default
+	m_rgbAlignment = GL_RGB;
+
 	// If the texture is a JPG file
-	if (m_filename.find(".jpg") != string::npos || m_filename.find(".JPG") != string::npos)
+	if (m_filename.find(".jpg") != string::npos || m_filename.find(".JPG") != string::npos || m_filename.find(".tga") != string::npos)
 	{
 		//Load the JPG associated to the texture
 		SDL_Surface* image = IMG_Load ( m_filename.c_str() );
+
+		//Test if RGB internal aligment is RGB or BGR - for that, evaluate Rmask field if it is FF0000 or 0000FF
+		if ( (image->format->Rmask & 0xFF) == 0 )
+			m_rgbAlignment = GL_BGR;
 
 		if ( image == NULL || ( image != NULL && ( image->h == 0 || image->w == 0 ) ) ) //Error
 		{
@@ -82,7 +89,7 @@ void CTexture::bindTexture()
 
 	glGenTextures(1, &m_ID);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_lWidth, m_lHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, m_Pixeldata);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_lWidth, m_lHeight, 0, m_rgbAlignment, GL_UNSIGNED_BYTE, m_Pixeldata);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }

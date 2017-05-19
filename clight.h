@@ -7,10 +7,6 @@ struct light
 {
 	glm::vec3 lightPosition;
 	glm::vec3 lightIntensity;
-	glm::vec3 ka;
-	glm::vec3 kd;
-	glm::vec3 ks;
-	float shininess;
 };
 
 class CLight

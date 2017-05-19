@@ -45,6 +45,7 @@ namespace GameObjectManager
 			// List of MD2 models
 			std::vector < CMd2model > m_GameObjectsMD2;
 
+			//Frame buffer object
 			CFbo *m_fbo;
 
 		public:

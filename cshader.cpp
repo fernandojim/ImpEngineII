@@ -194,4 +194,12 @@ void CShader::setUniformShaderTexture2D(const string variable, GLuint textureid)
 	glBindTexture(GL_TEXTURE_2D, textureid);
 }
 
+void CShader::setUniformShaderTextureCubeMap(const string variable, GLuint textureid)
+{
+	GLint val = glGetUniformLocation(m_uiProgram, variable.c_str());
+	glUniform1i(val, textureid);
+	glActiveTexture(GL_TEXTURE0 + textureid);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureid);
+}
+
 

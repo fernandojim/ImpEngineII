@@ -4,6 +4,7 @@
  *  Created on: 26 de abr. de 2017
  *      Author: fjimartinez
  */
+
 #include "stdafx.h"
 
 #include "cfbo.h"
@@ -36,7 +37,6 @@ CFbo::~CFbo()
 
 void CFbo::Create()
 {
-	GLenum err = 0;
 	//Generate and bind the frame buffer
 	glGenFramebuffers(1, &m_uiFboHandler);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_uiFboHandler);
@@ -67,7 +67,6 @@ void CFbo::Create()
 	glBindRenderbuffer(GL_RENDERBUFFER, m_uiDepthHandler);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_uiDepthHandler);
-	err = glGetError();
 
 	//Set the target for the fragment shader output
 	GLenum drawBufs[] = { GL_COLOR_ATTACHMENT0 };

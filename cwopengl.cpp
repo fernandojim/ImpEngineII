@@ -160,6 +160,9 @@ void CWOpenGL::Create()
 		throw std::exception();
 	}
 
+	//Initialize the scene
+	InitScene();
+
 	/*char cad[300];
 	const GLubyte *vendor = glGetString(GL_VENDOR);
 	const GLubyte *renderer = glGetString(GL_RENDERER);
@@ -173,6 +176,16 @@ void CWOpenGL::Create()
 	/* 0 -> without sync refresh */
 	/* 1 -> Sync refresh */
 	SDL_GL_SetSwapInterval((int)m_bvsync);
+}
+
+void CWOpenGL::InitScene()
+{
+	glViewport(0, 0, m_width, m_height);
+
+	//Init OpenGL
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glEnable(GL_DEPTH_TEST);
+	glClearDepth(GL_TRUE);
 }
 
 void CWOpenGL::Resize()

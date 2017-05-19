@@ -40,7 +40,7 @@ CTerrain::CTerrain(const string file) : CGameObject()
 
 		m_tilingFactorSand = 1.0;
 		m_tilingFactorGrass = 1.0;
-		m_tilingFactorDirt = 1.0;
+		m_tilingFactorDirt = 0.01;
 		m_tilingFactorSnow = 1.0;
 
 		/* Load the materials from file */

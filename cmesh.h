@@ -52,6 +52,7 @@ private:
 
 public:
 	//Constructor with object and shader files
+	CMesh();
 	CMesh(const string name);
 
 	//Destructor

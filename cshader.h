@@ -53,6 +53,7 @@ class CShader
 		void    setUniformShaderMatrix3fv(const string &variable, GLsizei count, GLboolean traspose, const GLfloat *value);
 		void    setUniformShaderMatrix4fv(const string variable, GLsizei count, GLboolean traspose, const GLfloat *value);
 		void 	setUniformShaderTexture2D(const string variable, GLuint textureid);
+		void 	setUniformShaderTextureCubeMap(const string variable, GLuint textureid);
 
 		ERROR_TYPE CreaShaders(const char* vs, const char* fs);
 	private:
